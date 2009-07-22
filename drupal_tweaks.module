@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Drupal tweaks settings to improve your functionality on your website
+ *
+ * @version
+ *   $Id$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function drupal_tweaks_menu() { 
+  $items['admin/settings/drupal_tweaks'] = array(
+    'title' => 'Drupal Tweaks',
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('drupal_tweaks_settings_form'), 
+    'access arguments' => array('administer drupal_tweaks'),
+    'weight' => 10,
+    'file' => 'drupal_tweaks.admin.inc', 
+);
+
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_init().
+ */
+function drupal_tweaks_boot() {
+  /* LOAD INCLUDES */
+  include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
+  include_once './includes/path.inc';   // for arg() called from menu_get_item()
+  include_once './includes/menu.inc';   // for menu_get_item() called from magic_cache_cache_key()
+  module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+
+  /* LOAD DB SETTINGS */
+  $php_conf = drupal_tweaks_get_php_configuration(TRUE);
+            
+  /* validate PHP */
+  foreach ($php_conf as $var_name => $var_values) {
+      // update mysql settings if necessary
+      if ($var_values['conf'] <> $var_values['php']) {
+          if (!ini_set($var_name, $var_values['conf'])) {
+            drupal_set_message(t('Cannot set variable `%variable` to `%value` in your PHP configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])). t('<br>') . t('Probably you do not have proper privileges.'), 'error');
+            variable_set($var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
+          }
+      }
+  }
+}
+
+
+/**
+ * Implementation of hook_perm().
+ */
+function drupal_tweaks_perm() {
+   return array('administer drupal_tweaks');
+}
+

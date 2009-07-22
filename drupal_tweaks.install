@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ *   Installation file
+ *
+ * @version
+ *   $Id$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function drupal_tweaks_install() {
+  $min_weight = db_result(db_query("SELECT MIN(weight) FROM {system}"));
+  db_query("UPDATE {system} SET bootstrap = '%d', weight = '%d' WHERE name = 'drupal_tweaks'", 1, $min_weight);
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function drupal_tweaks_uninstall() {
+  variable_del('php_max_execution_time');
+  variable_del('php_memory_limit');
+}
+
