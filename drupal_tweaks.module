@@ -12,21 +12,82 @@
  */
 
 /**
+ * Minimum recommended value of PHP memory_limit.
+ */
+define('DRUPAL_MINIMUM_PHP_MEMORY_LIMIT', '16M'); 
+/**
+ * Minimum recommended value of PHP max_execution_time limit.
+ */
+define('DRUPAL_MINIMUM_MAX_EXECUTION_TIME', '30'); 
+
+/**
  * Implementation of hook_menu().
  */
 function drupal_tweaks_menu() { 
+  $items['admin/settings/drupal_tweaks/general'] = array(
+    'title' => t('General'),
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  ); 
   $items['admin/settings/drupal_tweaks'] = array(
-    'title' => 'Drupal Tweaks',
+    'title' => t('Drupal tweaks'),
+    'description' => t('General tweaks for Drupal modules'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_general_settings_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'drupal_tweaks.admin.inc',
+  );
+  $items['admin/settings/drupal_tweaks/php'] = array(
+    'title' => 'PHP settings',
     'page callback' => 'drupal_get_form', 
-    'page arguments' => array('drupal_tweaks_settings_form'), 
+    'page arguments' => array('drupal_tweaks_php_settings_form'), 
     'access arguments' => array('administer drupal_tweaks'),
     'weight' => 10,
     'file' => 'drupal_tweaks.admin.inc', 
-);
+    'type' => MENU_LOCAL_TASK,
+  );
 
   return $items;
 }
 
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
+  //drupal_set_message($form_id);
+  switch ($form_id) {
+    case 'node_admin_content':
+      // TODO: something here?
+      break;
+    case 'filter_admin_format_form':
+      if (variable_get('drupal_tweaks_filter_tweak', TRUE)) {
+        /* add module name on each filter name (See: admin/settings/filters/1) */
+        foreach (filter_list_all() as $filter_key => $filter_data) {
+          if (array_key_exists($filter_key, $form['filters'])) {
+            $form['filters'][$filter_key]['#title'] .= " ($filter_data->module)";
+          }
+        }
+      }
+      break;
+    case 'views_ui_list_views_form':
+      if (variable_get('drupal_tweaks_views_tweak', TRUE)) {
+        views_include_default_views(); 
+        // Invoke hook_views_default_views for all modules.
+        foreach (module_implements('views_default_views') as $module) {
+          $default_views = module_invoke($module, 'views_default_views');
+          $view_names = array_keys($default_views);
+          foreach ($view_names as $view_name) {
+            if (array_key_exists($view_name, $form['#parameters'][1]['views'])) {
+              $desc = &$form['#parameters'][1]['views'][$view_name]->description;
+              $desc = t('Module: ') . $module . '; ' . $desc;
+            }
+          }
+        } 
+      }
+      break;
+  }
+}
 
 /**
  * Implementation of hook_init().
@@ -35,7 +96,7 @@ function drupal_tweaks_boot() {
   /* LOAD INCLUDES */
   include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
   include_once './includes/path.inc';   // for arg() called from menu_get_item()
-  include_once './includes/menu.inc';   // for menu_get_item() called from magic_cache_cache_key()
+  include_once './includes/unicode.inc';   // for drupal_strtolower() called from parse_size()
   module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
 
   /* LOAD DB SETTINGS */

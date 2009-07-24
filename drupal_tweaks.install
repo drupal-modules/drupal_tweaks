@@ -23,7 +23,6 @@ function drupal_tweaks_install() {
  * Implementation of hook_uninstall().
  */
 function drupal_tweaks_uninstall() {
-  variable_del('php_max_execution_time');
-  variable_del('php_memory_limit');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'drupal_tweaks_%%'");
 }
 
