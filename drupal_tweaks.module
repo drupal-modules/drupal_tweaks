@@ -25,29 +25,25 @@ define('DRUPAL_MINIMUM_MAX_EXECUTION_TIME', '30');
  */
 function drupal_tweaks_menu() { 
   $items['admin/drupal_tweaks'] = array(
-    'title' => 'Content management',
-    'description' => "Manage your Drupal tweaks.",
+    'title' => 'Drupal Tweaks',
+    'description' => "Administer items related to Drupal tweaks.",
     'position' => 'left',
-    'weight' => -10,
+    'weight' => 0,
     'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('administer drupal_tweaks'),
+    'access arguments' => array('access administration pages'),
     'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'), 
   ); 
 
   /* GENERAL PAGE */
   $items['admin/drupal_tweaks/general'] = array(
     'title' => 'General',
     'description' => t('General module and node operations.'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -2,
-  ); 
-  $items['admin/drupal_tweaks'] = array(
-    'title' => 'Drupal tweaks',
-    'description' => t('General tweak operations.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('drupal_tweaks_general_op_form'),
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.inc',
+    'type' => MENU_NORMAL_ITEM | MENU_DEFAULT_LOCAL_TASK,
   );
   $items['admin/drupal_tweaks/autocomplete/enabled_modules'] = array(
     'title' => 'Enable the module.',
@@ -83,7 +79,7 @@ function drupal_tweaks_menu() {
     'page arguments' => array('drupal_tweaks_op_form'),
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.op.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 2,
   );
   $items['admin/drupal_tweaks/op/rebuild_perm'] = array(
@@ -122,7 +118,7 @@ function drupal_tweaks_menu() {
     'page arguments' => array('drupal_tweaks_general_tweaks_form'),
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.tweaks.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 4,
   );
 
@@ -134,7 +130,7 @@ function drupal_tweaks_menu() {
     'page arguments' => array('drupal_tweaks_php_settings_form'), 
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.php.inc', 
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 5,
   );
 
@@ -146,8 +142,9 @@ function drupal_tweaks_menu() {
       'page callback' => 'drupal_get_form', 
       'page arguments' => array('db_tweaks_settings_form'), 
       'access arguments' => array('administer drupal_tweaks'),
-      'file' => 'modules/db_tweaks/db_tweaks.admin.inc', 
-      'type' => MENU_LOCAL_TASK,
+      'file' => 'db_tweaks.admin.inc', 
+      'file path' => drupal_get_path('module', 'db_tweaks'), 
+      'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
       'weight' => 6,
     );
   }
@@ -172,7 +169,7 @@ function drupal_tweaks_menu() {
     'page arguments' => array('drupal_tweaks_report_form'),
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.suggestions.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 8,
   );
 

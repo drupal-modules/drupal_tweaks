@@ -80,6 +80,7 @@ function drupal_tweaks_clear_cache_submit($form, &$form_state = array()) {
   drupal_flush_all_caches();
   drupal_set_message(t('Caches cleared.'));
   $form_state['redirect'] = 'admin/drupal_tweaks/op';
+  drupal_goto($form_state['redirect']);
 }
 
 /**
