@@ -17,9 +17,12 @@
 function drupal_tweaks_report_form() {
   $no_problems = TRUE;
   module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+
+  /* CHECK FOR MENU_ROUTER TABLE IF NEEDS TO BE REBUILD */
   $no_problems = $no_problems && drupal_tweaks_op_cache_messages(); // Defined in drupal_tweaks.inc
 
   /* FIXME: Checking new updates */
+  /*
   require_once './includes/install.inc';
   $modules = drupal_get_installed_schema_version(NULL, FALSE, TRUE);
   foreach ($modules as $module => $schema_version) {
@@ -32,6 +35,19 @@ function drupal_tweaks_report_form() {
       }
     }
   }
+   */
+
+  /* CHECK FOR DUPLICATED MODULES */
+  $duplicates = drupal_tweaks_report_duplicated_modules();
+  if ($duplicates != NULL) {
+    $no_problems = !drupal_set_message(t('Duplicated modules detected (%module1 and %module2)! Please remove one of those.', array('%module1' => $duplicates[0], '%module2' => $duplicates[1])), 'error');
+  }
+
+  /* CHECK PHP MEMORY */
+  if (!drupal_tweaks_report_check_memory()) {
+    $no_problems = !drupal_set_message(t('You should consider to increase your PHP memory limit to prevent crashes of your websites. Limit: %limit; Current usage: %current', array('%limit' => ini_get("memory_limit"), '%current' =>  round(memory_get_usage()/1024/1024).'M')), 'warning');
+  }
+
 
   if ($no_problems) {
     drupal_set_message(t('No problem detected.'));

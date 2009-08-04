@@ -1,0 +1,7 @@
+; $Id$
+name = Database tweaks
+description = Database tweaks module for additional MySQL settings
+core = 6.x
+package = Drupal Tweaks
+version = VERSION
+

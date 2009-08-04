@@ -63,3 +63,27 @@ function drupal_tweaks_op_cache_messages() {
   return $all_right;
 }
 
+/**
+ * Check for duplicated module files in filesystem
+ */
+function drupal_tweaks_report_duplicated_modules($all = FALSE) {
+  /* check for duplicated modules */
+  $files = drupal_system_listing('\.module$', 'modules', 'filename', 0);
+  $modules = array();
+  foreach ($files as $path => $file) {
+    if (array_key_exists($file->name, $modules)) {
+      return array($path, $modules[$file->name]);
+    } else {
+      $modules[$file->name] = $path;
+    }
+  }
+  return NULL;
+}
+
+/**
+ * Check recommended memory usage. You should have at least twice memory that is used
+ */
+function drupal_tweaks_report_check_memory() {
+  return memory_get_usage()*2 < parse_size(ini_get("memory_limit"));
+}
+

@@ -138,18 +138,6 @@ function drupal_tweaks_menu() {
     'weight' => 5,
   );
 
-  /* DB SETTINGS PAGE */
-  $items['admin/drupal_tweaks/db'] = array(
-    'title' => 'DB',
-    'description' => t('Database Settings.'),
-    'page callback' => 'drupal_get_form', 
-    'page arguments' => array('drupal_tweaks_db_settings_form'), 
-    'access arguments' => array('administer drupal_tweaks'),
-    'file' => 'includes/drupal_tweaks.admin.db.inc', 
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 6,
-  );
-
   /* SETTINGS PAGE */
   $items['admin/drupal_tweaks/settings'] = array(
     'title' => 'Settings',
@@ -204,40 +192,6 @@ function drupal_tweaks_boot() {
         }
     }
   }
-
-  /* DATABASE TWEAKS */
-  if (variable_get('drupal_tweaks_db_activated', FALSE)) {
-    global $db_type;
-    switch ($db_type) {
-        case 'mysql':
-        case 'mysqli':
-            /* LOAD INCLUDES */
-            include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
-            include_once './includes/path.inc';   // for arg() called from menu_get_item()
-            include_once './includes/menu.inc';   // for menu_get_item() called from magic_cache_cache_key()
-            module_load_include('db.inc', 'drupal_tweaks', 'includes/drupal_tweaks'); // load additional function from included file
-
-            /* LOAD DB SETTINGS */
-            $mysql_conf = drupal_tweaks_db_get_mysql_configuration(TRUE);
-            
-            foreach ($mysql_conf as $var_name => $var_values) {
-                // update mysql settings if necessary
-                if ($var_values['conf'] <> $var_values['mysql']) {
-                    if (!drupal_tweaks_db_set_mysql_variable($var_name, $var_values['conf'])) {
-                        if (user_access('administer database')) {
-                            drupal_set_message(t('Cannot set variable `%variable` to `%value` in your database configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])).
-                                t('<br>') . t('Probably you do not have proper privileges.'), 'error');
-                        }
-                        variable_set($var_name, $var_values['mysql']); // reverting changes in settings (to prevent showing error message)
-                    }
-                }
-            }
-            break;
-        case 'pgsql':
-        default:
-          /* TODO: database not supported */
-    }
-  }
 }
 
 /**
@@ -284,5 +238,11 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
  */
 function drupal_tweaks_perm() {
    return array('administer drupal_tweaks');
+}
+
+/**
+ * Implementation of hook_exit().
+ */
+function drupal_tweaks_exit() {
 }
 

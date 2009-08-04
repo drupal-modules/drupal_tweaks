@@ -2,6 +2,6 @@
 name = Drupal tweaks
 description = Drupal tweaks module for additional functionality
 core = 6.x
-package = Development
+package = Drupal Tweaks
 version = VERSION
 
