@@ -24,27 +24,154 @@ define('DRUPAL_MINIMUM_MAX_EXECUTION_TIME', '30');
  * Implementation of hook_menu().
  */
 function drupal_tweaks_menu() { 
-  $items['admin/settings/drupal_tweaks/general'] = array(
-    'title' => t('General'),
+  $items['admin/drupal_tweaks'] = array(
+    'title' => 'Content management',
+    'description' => "Manage your Drupal tweaks.",
+    'position' => 'left',
     'weight' => -10,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  ); 
-  $items['admin/settings/drupal_tweaks'] = array(
-    'title' => t('Drupal tweaks'),
-    'description' => t('General tweaks for Drupal modules'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('drupal_tweaks_general_settings_form'),
+    'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('administer drupal_tweaks'),
-    'file' => 'drupal_tweaks.admin.inc',
+    'file' => 'system.admin.inc',
+  ); 
+
+  /* GENERAL PAGE */
+  $items['admin/drupal_tweaks/general'] = array(
+    'title' => 'General',
+    'description' => t('General module and node operations.'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -2,
+  ); 
+  $items['admin/drupal_tweaks'] = array(
+    'title' => 'Drupal tweaks',
+    'description' => t('General tweak operations.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_general_op_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.inc',
   );
-  $items['admin/settings/drupal_tweaks/php'] = array(
-    'title' => 'PHP settings',
+  $items['admin/drupal_tweaks/autocomplete/enabled_modules'] = array(
+    'title' => 'Enable the module.',
+    'page callback' => 'drupal_tweaks_autocomplete_modules',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
+  $items['admin/drupal_tweaks/autocomplete/disabled_modules'] = array(
+    'title' => 'Disable the module.',
+    'page callback' => 'drupal_tweaks_autocomplete_modules',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
+  $items['admin/drupal_tweaks/autocomplete/nodes'] = array(
+    'title' => 'Find the node.',
+    'page callback' => 'drupal_tweaks_autocomplete_nodes',
+    'page arguments' => array(0),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
+
+  /* OPERATION PAGE */
+  $items['admin/drupal_tweaks/op'] = array(
+    'title' => 'Operations',
+    'description' => t('Flush operations (clear cache, rebuild permissions, etc.)'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_op_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.op.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+  $items['admin/drupal_tweaks/op/rebuild_perm'] = array(
+    'title' => 'Rebuild permissions',
+    'page arguments' => array('drupal_tweaks_rebuild_perm_confirm'),
+    'file' => 'includes/drupal_tweaks.admin.op.inc',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+  ); 
+  $items['admin/drupal_tweaks/op/clear_cache'] = array(
+    'title' => 'Rebuild cache',
+    'page arguments' => array('drupal_tweaks_clear_cache_submit'),
+    'file' => 'includes/drupal_tweaks.admin.op.inc',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+  ); 
+  /* BLOCK PAGE */
+/* TODO
+  $items['admin/drupal_tweaks/block'] = array(
+    'title' => 'Blocks',
+    'description' => t('Block conversion operations.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_block_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.block.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+*/
+
+  /* TWEAKS MODULE PAGE */
+  $items['admin/drupal_tweaks/module_tweaks'] = array(
+    'title' => 'Tweaks',
+    'description' => t('Tweaks settings for Drupal modules.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_general_tweaks_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.tweaks.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
+
+  /* PHP SETTINGS PAGE */
+  $items['admin/drupal_tweaks/php'] = array(
+    'title' => 'PHP',
+    'description' => t('PHP Settings.'),
     'page callback' => 'drupal_get_form', 
     'page arguments' => array('drupal_tweaks_php_settings_form'), 
     'access arguments' => array('administer drupal_tweaks'),
-    'weight' => 10,
-    'file' => 'drupal_tweaks.admin.inc', 
+    'file' => 'includes/drupal_tweaks.admin.php.inc', 
     'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+  );
+
+  /* DB SETTINGS PAGE */
+  $items['admin/drupal_tweaks/db'] = array(
+    'title' => 'DB',
+    'description' => t('Database Settings.'),
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('drupal_tweaks_db_settings_form'), 
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.db.inc', 
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 6,
+  );
+
+  /* SETTINGS PAGE */
+  $items['admin/drupal_tweaks/settings'] = array(
+    'title' => 'Settings',
+    'description' => t('Drupal Tweaks module settings.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_general_settings_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.settings.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 7,
+  );
+
+  /* REPORT PAGE */
+  $items['admin/drupal_tweaks/suggestions'] = array(
+    'title' => 'Suggestions',
+    'description' => t('Check for problems or suggestions with your website.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_report_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.suggestions.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 8,
   );
 
   return $items;
@@ -52,10 +179,73 @@ function drupal_tweaks_menu() {
 
 
 /**
+ * Implementation of hook_init().
+ */
+function drupal_tweaks_boot() {
+  /* PHP TWEAKS */
+  if (variable_get('drupal_tweaks_php_activated', FALSE)) {
+    /* LOAD INCLUDES */
+    include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
+    include_once './includes/path.inc';   // for arg() called from menu_get_item()
+    include_once './includes/unicode.inc';   // for drupal_strtolower() called from parse_size()
+    module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+
+    /* LOAD DB SETTINGS */
+    $php_conf = drupal_tweaks_get_php_configuration(TRUE);
+
+    /* validate PHP */
+    foreach ($php_conf as $var_name => $var_values) {
+        // update mysql settings if necessary
+        if ($var_values['conf'] <> $var_values['php']) {
+            if (!ini_set($var_name, $var_values['conf'])) {
+              drupal_set_message(t('Cannot set variable `%variable` to `%value` in your PHP configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])). t('<br>') . t('Probably you do not have proper privileges.'), 'error');
+              variable_set($var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
+            }
+        }
+    }
+  }
+
+  /* DATABASE TWEAKS */
+  if (variable_get('drupal_tweaks_db_activated', FALSE)) {
+    global $db_type;
+    switch ($db_type) {
+        case 'mysql':
+        case 'mysqli':
+            /* LOAD INCLUDES */
+            include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
+            include_once './includes/path.inc';   // for arg() called from menu_get_item()
+            include_once './includes/menu.inc';   // for menu_get_item() called from magic_cache_cache_key()
+            module_load_include('db.inc', 'drupal_tweaks', 'includes/drupal_tweaks'); // load additional function from included file
+
+            /* LOAD DB SETTINGS */
+            $mysql_conf = drupal_tweaks_db_get_mysql_configuration(TRUE);
+            
+            foreach ($mysql_conf as $var_name => $var_values) {
+                // update mysql settings if necessary
+                if ($var_values['conf'] <> $var_values['mysql']) {
+                    if (!drupal_tweaks_db_set_mysql_variable($var_name, $var_values['conf'])) {
+                        if (user_access('administer database')) {
+                            drupal_set_message(t('Cannot set variable `%variable` to `%value` in your database configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])).
+                                t('<br>') . t('Probably you do not have proper privileges.'), 'error');
+                        }
+                        variable_set($var_name, $var_values['mysql']); // reverting changes in settings (to prevent showing error message)
+                    }
+                }
+            }
+            break;
+        case 'pgsql':
+        default:
+          /* TODO: database not supported */
+    }
+  }
+}
+
+/**
  * Implementation of hook_form_alter().
  */
 function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
   //drupal_set_message($form_id);
+  /* MODULE TWEAKS */
   switch ($form_id) {
     case 'node_admin_content':
       // TODO: something here?
@@ -88,32 +278,6 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
       break;
   }
 }
-
-/**
- * Implementation of hook_init().
- */
-function drupal_tweaks_boot() {
-  /* LOAD INCLUDES */
-  include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
-  include_once './includes/path.inc';   // for arg() called from menu_get_item()
-  include_once './includes/unicode.inc';   // for drupal_strtolower() called from parse_size()
-  module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
-
-  /* LOAD DB SETTINGS */
-  $php_conf = drupal_tweaks_get_php_configuration(TRUE);
-            
-  /* validate PHP */
-  foreach ($php_conf as $var_name => $var_values) {
-      // update mysql settings if necessary
-      if ($var_values['conf'] <> $var_values['php']) {
-          if (!ini_set($var_name, $var_values['conf'])) {
-            drupal_set_message(t('Cannot set variable `%variable` to `%value` in your PHP configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])). t('<br>') . t('Probably you do not have proper privileges.'), 'error');
-            variable_set($var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
-          }
-      }
-  }
-}
-
 
 /**
  * Implementation of hook_perm().
