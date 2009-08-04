@@ -88,15 +88,25 @@ function drupal_tweaks_general_op_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   switch ($values['op']) {
     case t('Save'):
-      if (!empty($values['drupal_tweaks_enable_module']) && !module_exists($values['drupal_tweaks_enable_module'])) {
-        module_enable(array($values['drupal_tweaks_enable_module']));
-        drupal_flush_all_caches();
-        drupal_set_message(t('Module %module enabled.', $values['drupal_tweaks_enable_module']));
+      $module_enable = $values['drupal_tweaks_enable_module'];
+      $module_disable = $values['drupal_tweaks_disable_module'];
+
+      if (!empty($module_enable) && !module_exists($module_enable)) {
+        include_once './includes/install.inc';
+        drupal_install_modules(array($module_enable));
+        if (module_exists($module_enable)) {
+          drupal_set_message(t('Module %module successfully enabled.', array('%module' => $module_enable)));
+        } else {
+          drupal_set_message(t('Unknown error on enabling %module module.', array('%module' => $module_enable)), 'error');
+        }
       }
-      if (!empty($values['drupal_tweaks_disable_module']) && module_exists($values['drupal_tweaks_disable_module'])) {
-        module_disable(array($values['drupal_tweaks_disable_module']));
-        drupal_flush_all_caches();
-        drupal_set_message(t('Module %module disabled.', $values['drupal_tweaks_disable_module']));
+      if (!empty($module_disable) && module_exists($module_disable)) {
+        module_disable(array($module_disable));
+        if (!module_exists($module_disable)) {
+          drupal_set_message(t('Module %module successfully disabled.', array('%module' => $module_disable)));
+        } else {
+          drupal_set_message(t('Unknown error on disabling %module module.', array('%module' => $module_disable)), 'error');
+        }
       }
     break;
   }
