@@ -20,19 +20,7 @@ define('DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET', '2M');
  * Implementation of hook_menu().
  */
 function db_tweaks_menu() { 
-  if (module_exists('drupal_tweaks')) {
-    /* DB SETTINGS PAGE */
-    $items['admin/drupal_tweaks/db'] = array(
-      'title' => 'DB',
-      'description' => t('Database Settings.'),
-      'page callback' => 'drupal_get_form', 
-      'page arguments' => array('db_tweaks_settings_form'), 
-      'access arguments' => array('administer drupal_tweaks'),
-      'file' => 'includes/drupal_tweaks.admin.db.inc', 
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 6,
-    );
-  } else {
+  if (!module_exists('drupal_tweaks')) {
     $items['admin/settings/db_tweaks'] = array(
       'title' => 'Database Tweaks',
       'description' => t('Change database settings.'),

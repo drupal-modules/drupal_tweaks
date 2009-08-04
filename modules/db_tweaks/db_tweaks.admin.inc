@@ -26,7 +26,7 @@ function db_tweaks_settings_form() {
     '#type' => 'checkbox',
     '#title' => t('Enable database tweaks.'),
     '#description' => t('Select if you want to enable above changes.'),
-    '#default_value' => variable_get('drupal_tweaks_db_activated', FALSE),
+    '#default_value' => variable_get('db_tweaks_activated', FALSE),
   );
 
   global $db_type;
@@ -111,7 +111,7 @@ function db_tweaks_settings_form() {
   }
   $form['#validate'] = array('db_tweaks_settings_form_validate');
 
-  if (!variable_get('drupal_tweaks_db_activated', FALSE)) {
+  if (!variable_get('db_tweaks_activated', FALSE)) {
     drupal_set_message(t('Please enable database tweaks to activate following settings.'), 'warning');
   }
 

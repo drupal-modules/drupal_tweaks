@@ -138,6 +138,20 @@ function drupal_tweaks_menu() {
     'weight' => 5,
   );
 
+  if (module_exists('db_tweaks')) {
+    /* DB SETTINGS PAGE */
+    $items['admin/drupal_tweaks/db'] = array(
+      'title' => 'DB',
+      'description' => t('Database Settings.'),
+      'page callback' => 'drupal_get_form', 
+      'page arguments' => array('db_tweaks_settings_form'), 
+      'access arguments' => array('administer drupal_tweaks'),
+      'file' => 'modules/db_tweaks/db_tweaks.admin.inc', 
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 6,
+    );
+  }
+
   /* SETTINGS PAGE */
   $items['admin/drupal_tweaks/settings'] = array(
     'title' => 'Settings',
