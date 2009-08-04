@@ -61,6 +61,7 @@ function drupal_tweaks_general_op_form() {
     '#autocomplete_path' => 'admin/drupal_tweaks/autocomplete/nodes',
     '#size' => 30,
     '#maxlength' => 60,
+    '#suffix' => t('Under development'),
   );
   $form['drupal_tweaks_user_op'] = array(
     '#type' => 'fieldset',
@@ -76,6 +77,7 @@ function drupal_tweaks_general_op_form() {
     '#autocomplete_path' => 'user/autocomplete',
     '#size' => 30,
     '#maxlength' => 60,
+    '#suffix' => t('Under development'),
   );
 
   return $form;
