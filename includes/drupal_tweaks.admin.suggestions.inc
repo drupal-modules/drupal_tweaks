@@ -40,7 +40,7 @@ function drupal_tweaks_report_form() {
 
   /* CHECK FOR DUPLICATED AND MISSING MODULES */
   $issues = drupal_tweaks_report_module_issues();
-  $no_problems = !empty($issues);
+  $no_problems = $no_problems && empty($issues);
 
   /* CHECK PHP MEMORY */
   if (!drupal_tweaks_report_check_memory()) {
