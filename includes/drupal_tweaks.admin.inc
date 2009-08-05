@@ -16,6 +16,8 @@
  * Menu callback for the settings general operation form.
  */
 function drupal_tweaks_general_op_form() {
+  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+  drupal_tweaks_include_shared_code();
 
   /* MODULE OPERATIONS */
   $form['drupal_tweaks_modules_op'] = array(

@@ -16,7 +16,9 @@
  * Menu callback for the settings form.
  */
 function drupal_tweaks_php_settings_form() {
-  module_load_include('inc', 'drupal_tweaks');
+  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+  drupal_tweaks_include_shared_code();
+
   $php_conf = drupal_tweaks_get_php_configuration(); // get actual settings
   if ((bool)$php_conf['memory_limit']['php'] !== (bool)$php_conf['memory_limit']['conf']) {
       drupal_set_message(t("Actual %variable is differ than it was set, probably you do not have proper privileges.", array('%variable' => 'memory_limit')),'error');

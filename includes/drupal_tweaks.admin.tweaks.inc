@@ -16,6 +16,9 @@
  * Menu callback for the settings form.
  */
 function drupal_tweaks_general_tweaks_form() {
+  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+  drupal_tweaks_include_shared_code();
+
   if (module_exists('filter')) {
     $module_name = 'Filter';
     $form['drupal_tweaks_filter'] = array(

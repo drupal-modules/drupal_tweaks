@@ -15,9 +15,10 @@
  * Menu callback for the error reporting form
  */
 function drupal_tweaks_report_form() {
-  $no_problems = TRUE;
-  module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+  drupal_tweaks_include_shared_code();
 
+  $no_problems = TRUE;
   /* CHECK FOR MENU_ROUTER TABLE IF NEEDS TO BE REBUILD */
   $no_problems = $no_problems && drupal_tweaks_op_cache_messages(); // Defined in drupal_tweaks.inc
 

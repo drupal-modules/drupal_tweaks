@@ -95,4 +95,25 @@ function drupal_tweaks_report_check_memory() {
   return memory_get_usage()*2 < parse_size(ini_get("memory_limit"));
 }
 
+/**
+ * Shared include block code for each setting page
+ */
+function drupal_tweaks_include_shared_code() {
+/*
+ * Javascript code for anonymous statistics within drupal_tweaks pages
+ * It will give opportunity to improve which settings are more popular than other
+ */
+  variable_get('drupal_tweaks_settings_stats_activated', TRUE) ? 
+  drupal_add_js('
+  <script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src=\'" + gaJsHost + "google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+  try {
+  var pageTracker = _gat._getTracker("UA-948811-17");
+  pageTracker._trackPageview();
+  } catch(err) {}</script>
+  ', 'inline', 'footer') : NULL;
+}
 

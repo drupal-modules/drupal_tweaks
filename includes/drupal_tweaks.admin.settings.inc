@@ -16,6 +16,15 @@
  * Menu callback for the settings form.
  */
 function drupal_tweaks_general_settings_form() {
+  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+  drupal_tweaks_include_shared_code();
+
+  $form['drupal_tweaks']['drupal_tweaks_settings_stats_activated'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Send anonymous statistics about module usage through Google Analytics.'),
+    '#description' => t('It will help to improve functionality of this module even better.'),
+    '#default_value' => variable_get('drupal_tweaks_settings_stats_activated', TRUE),
+  );
 
   return system_settings_form($form); 
 }

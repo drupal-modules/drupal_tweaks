@@ -27,6 +27,9 @@ define(REGEX_HELP, "http://php.net/manual/en/book.pcre.php");
  * Menu callback for the settings form.
  */
 function drupal_tweaks_msgs_settings_form() {
+  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+  drupal_tweaks_include_shared_code();
+
   $form['drupal_tweaks_msgs'] = array(
     '#type' => 'fieldset',
     '#title' => t('Messages tweaks'),
