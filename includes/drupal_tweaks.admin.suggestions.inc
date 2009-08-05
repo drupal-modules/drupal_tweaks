@@ -37,11 +37,9 @@ function drupal_tweaks_report_form() {
   }
    */
 
-  /* CHECK FOR DUPLICATED MODULES */
-  $duplicates = drupal_tweaks_report_duplicated_modules();
-  if ($duplicates != NULL) {
-    $no_problems = !drupal_set_message(t('Duplicated modules detected (%module1 and %module2)! Please remove one of those.', array('%module1' => $duplicates[0], '%module2' => $duplicates[1])), 'error');
-  }
+  /* CHECK FOR DUPLICATED AND MISSING MODULES */
+  $issues = drupal_tweaks_report_module_issues();
+  $no_problems = !empty($issues);
 
   /* CHECK PHP MEMORY */
   if (!drupal_tweaks_report_check_memory()) {

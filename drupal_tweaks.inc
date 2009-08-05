@@ -66,18 +66,26 @@ function drupal_tweaks_op_cache_messages() {
 /**
  * Check for duplicated module files in filesystem
  */
-function drupal_tweaks_report_duplicated_modules($all = FALSE) {
+function drupal_tweaks_report_module_issues($verbose = TRUE, $all = TRUE) {
+  $res = array();
   /* check for duplicated modules */
   $files = drupal_system_listing('\.module$', 'modules', 'filename', 0);
   $modules = array();
   foreach ($files as $path => $file) {
     if (array_key_exists($file->name, $modules)) {
-      return array($path, $modules[$file->name]);
+      drupal_set_message(t('Duplicated modules detected (%module1 and %module2)! Please remove one of those.', array('%module1' => $duplicates[0], '%module2' => $duplicates[1])), 'error');
+      $res[] = array($path, $modules[$file->name]);
+      if ($all == FALSE) {
+        break;
+      }
     } else {
+      if (!file_exists($path)) {
+          drupal_set_message(t('Missing module detected (%module1)! <a href="!url">Clearing the cache</a> is recommenced.', array('%module1' => $duplicates[0], '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'error');
+      }
       $modules[$file->name] = $path;
     }
   }
-  return NULL;
+  return $res;
 }
 
 /**
@@ -86,4 +94,5 @@ function drupal_tweaks_report_duplicated_modules($all = FALSE) {
 function drupal_tweaks_report_check_memory() {
   return memory_get_usage()*2 < parse_size(ini_get("memory_limit"));
 }
+
 

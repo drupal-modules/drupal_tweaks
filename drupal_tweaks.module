@@ -110,6 +110,16 @@ function drupal_tweaks_menu() {
   );
 */
 
+  $items['admin/drupal_tweaks/msgs'] = array(
+    'title' => 'Msgs',
+    'description' => t('Configure drupal messages behaviour'),
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('drupal_tweaks_msgs_settings_form'), 
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.msgs.inc', 
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
   /* TWEAKS MODULE PAGE */
   $items['admin/drupal_tweaks/module_tweaks'] = array(
     'title' => 'Tweaks',
@@ -119,7 +129,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.tweaks.inc',
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-    'weight' => 4,
+    'weight' => 5,
   );
 
   /* PHP SETTINGS PAGE */
@@ -131,7 +141,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.php.inc', 
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-    'weight' => 5,
+    'weight' => 6,
   );
 
   if (module_exists('db_tweaks')) {
@@ -145,7 +155,7 @@ function drupal_tweaks_menu() {
       'file' => 'db_tweaks.admin.inc', 
       'file path' => drupal_get_path('module', 'db_tweaks'), 
       'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-      'weight' => 6,
+      'weight' => 7,
     );
   }
 
@@ -158,7 +168,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.settings.inc',
     'type' => MENU_LOCAL_TASK,
-    'weight' => 7,
+    'weight' => 8,
   );
 
   /* REPORT PAGE */
@@ -170,7 +180,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.suggestions.inc',
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-    'weight' => 8,
+    'weight' => 9,
   );
 
   return $items;
@@ -248,12 +258,113 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
  * Implementation of hook_perm().
  */
 function drupal_tweaks_perm() {
-   return array('administer drupal_tweaks');
+   return array('administer drupal_tweaks', 'show all status messages', 'show all warning messages', 'show all error messages');
 }
 
 /**
  * Implementation of hook_exit().
  */
 function drupal_tweaks_exit() {
+}
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ * Adds our own preprocess functions to some templates.
+ */
+function drupal_tweaks_theme_registry_alter(&$items) {
+  variable_set('drupal_tweaks_status_messages_theme_callback', $items['status_messages']['function']); // FIXME: later we can restore it in case if it's different than default
+  $items['status_messages']['function'] = 'drupal_tweaks_msg2log_theme_status_messages'; // take over theme_status_messages
+}
+
+/**
+ * Return a themed set of status and/or error messages. The messages are grouped
+ * by type.
+ *
+ * @param $display
+ *   (optional) Set to 'status' or 'error' to display only messages of that type.
+ *
+ * @return
+ *   A string containing the messages.
+ */
+function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
+  if (variable_get('drupal_tweaks_msg2log_activated', FALSE) && $messages_all = drupal_get_messages($display, FALSE)) {
+    foreach ($messages_all as $type => &$messages) {
+      foreach ($messages as $key => &$message) {
+        if (user_access('administer drupal_tweaks')) { // store all messages in separate session variable (used on settings page)
+            $_SESSION['drupal_tweaks_messages'][$type][] = $_SESSION['messages'][$type][$key]; 
+        }
+        if (!user_access("show all $type messages") && drupal_tweaks_msg2log_check_rule($message, $type)) {
+          watchdog($type, $message);
+          unset($_SESSION['messages'][$type][$key]);
+        }
+      }
+      if (empty($_SESSION['messages'][$type])) {
+        unset($_SESSION['messages'][$type]);
+      }
+    }
+  }
+  $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', theme_status_messages);
+  return $org_callback($display);
+}
+
+/**
+ * Check rule for single message if user should see it
+ *
+ * @param string $message
+ *   message to check
+ * @param string $type (optional)
+ *   The type of the message. One of the following values are possible:
+ *   - 'status'
+ *   - 'warning'
+ *   - 'error'
+ *
+ * @return
+ *   TRUE if rule was found (log the message), FALSE if rule wasn't found (ignore the message)
+ */
+function drupal_tweaks_msg2log_check_rule($message, $type = NULL) {
+  $msg_rules = explode("\n", variable_get('drupal_tweaks_msgs_' . $type . '_regex', implode("\n", drupal_tweaks_msg2log_settings_default_regex_rules($type))));
+  foreach ($msg_rules as $key => $msg_rule) {
+    if (!empty($msg_rule) && preg_match(trim($msg_rule), $message) != FALSE) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Get list of RegEx rules for messages of specified type
+ *
+ * @param string $type (optional)
+ *   The type of the message. One of the following values are possible:
+ *   - 'status'
+ *   - 'warning'
+ *   - 'error'
+ *
+ * @return
+ *   Return default RegEx rules for messages
+ */
+function drupal_tweaks_msg2log_settings_default_regex_rules($type) {
+  switch ($type) {
+    case 'error':
+      $msgs = array(
+        '@Fatal error:@',
+        '@ on line @',
+        '@MySQL@',
+      );
+      break;
+    case 'warning':
+      $msgs = array(
+        '@warning:@',
+        '@Fatal error:@',
+        '@ on line @',
+        '@MySQL@',
+      );
+      break;
+    case 'status':
+      $msgs = array(
+      );
+      break;
+  }
+  return $msgs;
 }
 
