@@ -121,6 +121,7 @@ function drupal_tweaks_include_shared_code() {
  * Check the message
  */
 function drupal_tweaks_msgs_give_advice($msg, $type) {
+  if (variable_get('drupal_tweaks_give_advice', TRUE))
   switch ($type) {
     case 'error':
       if (strpos($msg, 'user warning: Table') !== FALSE) { // 'user warning: Table 'xxx' doesn't exist query'
