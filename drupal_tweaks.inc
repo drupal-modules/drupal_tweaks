@@ -117,3 +117,23 @@ function drupal_tweaks_include_shared_code() {
   ', 'inline', 'footer') : NULL;
 }
 
+/**
+ * Check the message
+ */
+function drupal_tweaks_msgs_give_advice($msg, $type) {
+  switch ($type) {
+    case 'error':
+      if (strpos($msg, 'user warning: Table') !== FALSE) { // 'user warning: Table 'xxx' doesn't exist query'
+        preg_match("/FROM (?P<table_name>[a-z0-9_]+) /", $msg, $matches);
+        $table_name = $matches['table_name'];
+        //$module_name = TODO;
+        //drupal_set_message(t('It\'s recommended to reinstall this module to fix that problem.'), 'warning');
+        /* FIXME: Somebody interested to apply a proper code? */
+      } 
+
+      /* Note: Some of the PHP errors are not catchable; Example: warning: Wrong parameter count for strpos() in... */
+    break;
+    case 'warning':
+    break;
+  }
+}

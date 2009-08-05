@@ -45,31 +45,6 @@ function drupal_tweaks_menu() {
     'file' => 'includes/drupal_tweaks.admin.inc',
     'type' => MENU_NORMAL_ITEM | MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/drupal_tweaks/autocomplete/enabled_modules'] = array(
-    'title' => 'Enable the module.',
-    'page callback' => 'drupal_tweaks_autocomplete_modules',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer drupal_tweaks'),
-    'type' => MENU_CALLBACK,
-    'file' => 'includes/drupal_tweaks.ajax.inc',
-  );
-  $items['admin/drupal_tweaks/autocomplete/disabled_modules'] = array(
-    'title' => 'Disable the module.',
-    'page callback' => 'drupal_tweaks_autocomplete_modules',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer drupal_tweaks'),
-    'type' => MENU_CALLBACK,
-    'file' => 'includes/drupal_tweaks.ajax.inc',
-  );
-  $items['admin/drupal_tweaks/autocomplete/nodes'] = array(
-    'title' => 'Find the node.',
-    'page callback' => 'drupal_tweaks_autocomplete_nodes',
-    'page arguments' => array(0),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer drupal_tweaks'),
-    'type' => MENU_CALLBACK,
-    'file' => 'includes/drupal_tweaks.ajax.inc',
-  );
 
   /* OPERATION PAGE */
   $items['admin/drupal_tweaks/op'] = array(
@@ -96,19 +71,20 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'type' => MENU_CALLBACK,
   ); 
-  /* BLOCK PAGE */
-/* TODO
-  $items['admin/drupal_tweaks/block'] = array(
-    'title' => 'Blocks',
-    'description' => t('Block conversion operations.'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('drupal_tweaks_block_form'),
-    'access arguments' => array('administer drupal_tweaks'),
-    'file' => 'includes/drupal_tweaks.admin.block.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-  );
-*/
+  if (module_exists('db_tweaks')) {
+    /* BLOCK PAGE */
+    $items['admin/drupal_tweaks/block'] = array(
+      'title' => 'Block',
+      'description' => t('Convert any form or node into block.'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('form2block_settings_form'),
+      'access arguments' => array('administer drupal_tweaks'),
+      'file' => 'form2block.admin.inc', 
+      'file path' => drupal_get_path('module', 'form2block'), 
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 3,
+    );
+  }
 
   $items['admin/drupal_tweaks/msgs'] = array(
     'title' => 'Msgs',
@@ -181,6 +157,40 @@ function drupal_tweaks_menu() {
     'file' => 'includes/drupal_tweaks.admin.suggestions.inc',
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 9,
+  );
+
+  /* AJAX CALLBACKS */
+  $items['admin/drupal_tweaks/autocomplete/enabled_modules'] = array(
+    'title' => 'Enable the module.',
+    'page callback' => 'drupal_tweaks_autocomplete_modules',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
+  $items['admin/drupal_tweaks/autocomplete/disabled_modules'] = array(
+    'title' => 'Disable the module.',
+    'page callback' => 'drupal_tweaks_autocomplete_modules',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
+  $items['admin/drupal_tweaks/autocomplete/nodes'] = array(
+    'title' => 'Find the node.',
+    'page callback' => 'drupal_tweaks_autocomplete_nodes',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
+  $items['admin/drupal_tweaks/autocomplete/form_id'] = array(
+    'title' => 'Find the node.',
+    'page callback' => 'drupal_tweaks_autocomplete_form_id',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
   );
 
   return $items;
@@ -292,6 +302,8 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
       foreach ($messages as $key => &$message) {
         if (user_access('administer drupal_tweaks')) { // store all messages in separate session variable (used on settings page)
             $_SESSION['drupal_tweaks_messages'][$type][] = $_SESSION['messages'][$type][$key]; 
+            module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+            drupal_tweaks_msgs_give_advice($message, $type); // check if there is some advice regarding current message
         }
         if (!user_access("show all $type messages") && drupal_tweaks_msg2log_check_rule($message, $type)) {
           watchdog($type, $message);

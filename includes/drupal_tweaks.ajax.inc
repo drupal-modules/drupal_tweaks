@@ -44,3 +44,19 @@ function drupal_tweaks_autocomplete_nodes($string = '') {
   drupal_json($matches);
 }
 
+/**
+ * Menu callback; Retrieve a JSON object containing autocomplete suggestions for form_ids
+ */
+function drupal_tweaks_autocomplete_form_id($string = '') {
+  $menu_items = module_invoke_all('menu');
+  foreach ($menu_items as $path => $item) {
+    if ($item['page callback'] == 'drupal_get_form') {
+      if (strpos($path, $string) !== FALSE || strpos($item["page arguments"][0], $string) !== FALSE) {
+        $form_id = $item["page arguments"][0];
+        $form_callbacks[$form_id] = "$form_id ($path)";
+      }
+    }
+  }
+  drupal_json($form_callbacks);
+}
+
