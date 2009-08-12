@@ -99,7 +99,9 @@ function drupal_tweaks_general_op_form_submit($form, &$form_state) {
         include_once './includes/install.inc';
         drupal_install_modules(array($module_enable));
         if (module_exists($module_enable)) {
+          module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
           drupal_set_message(t('Module %module successfully enabled.', array('%module' => $module_enable)));
+          drupal_tweaks_module_check_db_changes($module_enable);
         } else {
           drupal_set_message(t('Unknown error on enabling %module module.', array('%module' => $module_enable)), 'error');
         }
@@ -108,6 +110,7 @@ function drupal_tweaks_general_op_form_submit($form, &$form_state) {
         module_disable(array($module_disable));
         if (!module_exists($module_disable)) {
           drupal_set_message(t('Module %module successfully disabled.', array('%module' => $module_disable)));
+          cache_clear_all();
         } else {
           drupal_set_message(t('Unknown error on disabling %module module.', array('%module' => $module_disable)), 'error');
         }

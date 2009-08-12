@@ -143,3 +143,25 @@ function drupal_tweaks_msgs_give_advice($msg, $type) {
     break;
   }
 }
+
+/**
+ * Check for changes provided by module and clear the caches
+ */
+function drupal_tweaks_module_check_db_changes($module_name) {
+  if ($menus = module_invoke(array($module_name), 'menu')) {
+    drupal_set_message(t('%module: New %type items detected!', array('%module' => $module_name, '%type' => 'menu')));
+    cache_clear_all(NULL, 'cache_menu');
+  }
+  if ($blocks = module_invoke($module_name, 'block')) {
+    drupal_set_message(t('%module: New %type items detected!', array('%module' => $module_name, '%type' => 'block')));
+    cache_clear_all(NULL, 'cache_block');
+  }
+  if ($filters = module_invoke($module_name, 'filter')) {
+    drupal_set_message(t('%module: New %type items detected!', array('%module' => $module_name, '%type' => 'filter')));
+    cache_clear_all(NULL, 'cache_filter');
+  }
+  if ($perms = module_invoke($module_name, 'perm')) {
+    drupal_set_message(t('%module: New %type items detected! (%data)', array('%module' => $module_name, '%type' => 'permission', '%data' => print_r($perms, true))));
+  }
+}
+
