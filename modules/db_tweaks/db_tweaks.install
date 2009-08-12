@@ -53,7 +53,7 @@ function db_tweaks_requirements($phase) {
                   // Test PHP memory_limit
                   $requirements[$var_name] = array(
                     'title' => $t('MySQL max_allowed_packet limit'),
-                    'value' => $mysql_conf['max_allowed_packet']['mysql'] . 'M',
+                    'value' => $mysql_conf['max_allowed_packet']['mysql'],
                   );
 
                   if (parse_size($var_values['mysql'] . 'M') < parse_size(DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET)) {
