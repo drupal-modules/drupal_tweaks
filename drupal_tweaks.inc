@@ -151,6 +151,8 @@ function drupal_tweaks_module_check_db_changes($module_name) {
   if ($menus = module_invoke(array($module_name), 'menu')) {
     drupal_set_message(t('%module: New %type items detected!', array('%module' => $module_name, '%type' => 'menu')));
     cache_clear_all(NULL, 'cache_menu');
+  } else {
+    drupal_tweaks_op_cache_messages();
   }
   if ($blocks = module_invoke($module_name, 'block')) {
     drupal_set_message(t('%module: New %type items detected!', array('%module' => $module_name, '%type' => 'block')));

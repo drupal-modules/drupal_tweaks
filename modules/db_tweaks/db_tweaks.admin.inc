@@ -62,14 +62,14 @@ function db_tweaks_settings_form() {
               '#description' => t('You may check your actual MySQL configuration on <a href="!url">Status Report page</a> or on <a href="!url_php">MySQL Info page</a>.', array('!url' => url('admin/reports/status'), '!url_php' => url('admin/reports/status/sql'))),
               '#collapsible' => TRUE,
           ); 
-          $form['db_tweaks']['mysql']['mysql_sql_big_selects'] = array(
+          $form['db_tweaks']['mysql']['db_tweaks_mysql_sql_big_selects'] = array(
               '#type' => 'select',
               '#title' => t('Enable SQL_BIG_SELECTS value'),
               '#description' => $sql_big_selects_description,
               '#default_value' => $mysql_conf['sql_big_selects']['mysql'],
               '#options' => array('ON' => t('ON'), 'OFF' => t('OFF')),
           ); 
-          $form['db_tweaks']['mysql']['mysql_max_join_size'] = array(
+          $form['db_tweaks']['mysql']['db_tweaks_mysql_max_join_size'] = array(
               '#type' => 'textfield',
               '#title' => t('Default MAX_JOIN_SIZE value'),
               '#value' => $mysql_conf['max_join_size']['mysql'],
@@ -80,16 +80,15 @@ function db_tweaks_settings_form() {
               '#disabled' => $mysql_conf['sql_big_selects']['mysql'] == 'ON',
               '#field_suffix' => t('joins'),
           ); 
-          $form['db_tweaks']['mysql']['mysql_max_allowed_packet'] = array(
+          $form['db_tweaks']['mysql']['db_tweaks_mysql_max_allowed_packet'] = array(
               '#type' => 'textfield',
               '#title' => t('Default MAX_ALLOWED_PACKET value'),
               '#default_value' => $mysql_conf['max_allowed_packet']['mysql'],
               '#size' => 20,
               '#maxlength' => 20,
               '#description' => $max_allowed_packet_description,
-              '#field_suffix' => t('MB'),
           ); 
-          $form['db_tweaks']['mysql']['mysql_wait_timeout'] = array(
+          $form['db_tweaks']['mysql']['db_tweaks_mysql_wait_timeout'] = array(
               '#type' => 'textfield',
               '#title' => t('Default wait_timeout value'),
               '#default_value' => $mysql_conf['wait_timeout']['mysql'],
@@ -99,7 +98,7 @@ function db_tweaks_settings_form() {
               '#field_suffix' => t('sec'),
           ); 
           $options = db_tweaks_get_mysql_modes();
-          $form['db_tweaks']['mysql']['mysql_sql_mode'] = array(
+          $form['db_tweaks']['mysql']['db_tweaks_mysql_sql_mode'] = array(
               '#type' => 'select',
               '#multiple' => TRUE,
               '#title' => t('Change SQL mode'),
@@ -130,13 +129,13 @@ function db_tweaks_settings_form_validate($form, &$form_state) {
             $mysql_conf = db_tweaks_get_mysql_configuration(TRUE); // get mysql configuration
 
             // get actual variables from configuration
-            $sql_big_selects = $form_state['values']['mysql_sql_big_selects'];
-            $max_join_size = $form_state['values']['mysql_max_join_size'];
-            $max_allowed_packet = $form_state['values']['mysql_max_allowed_packet']*1024*1024;
-            $wait_timeout = $form_state['values']['mysql_wait_timeout'];
-            $sql_mode = implode(',', $form_state['values']['mysql_sql_mode']);
+            $sql_big_selects = $form_state['values']['db_tweaks_mysql_sql_big_selects'];
+            $max_join_size = $form_state['values']['db_tweaks_mysql_max_join_size'];
+            $max_allowed_packet = parse_size($form_state['values']['db_tweaks_mysql_max_allowed_packet']);
+            $wait_timeout = $form_state['values']['db_tweaks_mysql_wait_timeout'];
+            $sql_mode = implode(',', $form_state['values']['db_tweaks_mysql_sql_mode']);
 
-            // validate MAX_JOIN_SIZE
+            // validate BIG_SELECTS
             if (!$mysql_conf['sql_big_selects']['mysql'] && empty($max_join_size)) {
                 if (!is_numeric($max_join_size) || ($max_join_size <= 0)) {
                     form_set_error('mysql_max_join_size', t('The MAX_JOIN_SIZE limit must be a number and greater than zero (current size is: %size).', array('%size' => $mysql_conf['max_join_size']['mysql'])));
@@ -145,40 +144,41 @@ function db_tweaks_settings_form_validate($form, &$form_state) {
                 }
             }
 
-            // validate MAX_ALLOWED_PACKET
-            if (!is_numeric($max_allowed_packet)) {
-                form_set_error('mysql_max_join_size', t('The MAX_ALLOWED_PACKET limit must be a number and greater than 0 (current size is: %size).', array('%size' => $mysql_conf['max_allowed_packet']['mysql'])));
-            }
-
             // validate WAIT_TIMEOUT
             if (!is_numeric($wait_timeout) || ($wait_timeout <= 0)) {
-                form_set_error('mysql_wait_timeout', t('The wait_timeout must be a number and greater than 0 (current timeout is: %size).', array('%size' => $mysql_conf['wait_timeout']['mysql'])));
+                form_set_error('db_tweaks_mysql_wait_timeout', t('The wait_timeout must be a number and greater than 0 (current timeout is: %size).', array('%size' => $mysql_conf['wait_timeout']['mysql'])));
             }
 
             /* validate configuration on MySQL server */
             if ($mysql_conf['sql_big_selects']['mysql'] <> $sql_big_selects) {
                 if (!db_tweaks_set_mysql_variable('sql_big_selects', $sql_big_selects)) {
-                  form_set_error('mysql_sql_big_selects', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'sql_big_selects')));
+                  form_set_error('db_tweaks_mysql_sql_big_selects', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'sql_big_selects')));
                 }
             }
             if (!$sql_big_selects && $mysql_conf['max_join_size']['mysql'] <> $max_join_size && is_numeric($max_join_size)) {
+              drupal_set_message('set:'.sql_max_join_size);
                 if (!db_tweaks_set_mysql_variable('sql_max_join_size', $sql_max_join_size)) {
-                  form_set_error('mysql_max_join_size', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'sql_max_join_size')));
+                  form_set_error('db_tweaks_mysql_max_join_size', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'sql_max_join_size')));
                 }
             }
-            if ($mysql_conf['max_allowed_packet']['mysql'] <> $max_allowed_packet && is_numeric($max_allowed_packet)) {
+
+            // validate MAX_ALLOWED_PACKET
+            if (parse_size($max_allowed_packet) <= parse_size(DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET)) {
+                form_set_error('db_tweaks_mysql_max_allowed_packet', t('The MAX_ALLOWED_PACKET limit must be a number and greater than %min_size (current size is: %size).', array('%min_size' => DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET, '%size' => $mysql_conf['max_allowed_packet']['mysql'])));
+            } else if (parse_size($mysql_conf['max_allowed_packet']['mysql']) <> parse_size($max_allowed_packet)) {
                 if (!db_tweaks_set_mysql_variable('max_allowed_packet', $max_allowed_packet)) {
-                  form_set_error('mysql_max_allowed_packet', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'max_allowed_packet')));
+                  form_set_error('db_tweaks_mysql_max_allowed_packet', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'max_allowed_packet')));
                 }
             }
+
             if ($mysql_conf['wait_timeout']['mysql'] <> $wait_timeout && is_numeric($wait_timeout)) {
                 if (!db_tweaks_set_mysql_variable('wait_timeout', $wait_timeout)) {
-                  form_set_error('mysql_wait_timeout', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'wait_timeout')));
+                  form_set_error('db_tweaks_mysql_wait_timeout', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'wait_timeout')));
                 }
             }
             if ($mysql_conf['sql_mode']['mysql'] <> $sql_mode) {
                 if (!db_tweaks_set_mysql_variable('sql_mode', $sql_mode)) {
-                  form_set_error('mysql_sql_mode', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'sql_mode')));
+                  form_set_error('db_tweaks_mysql_sql_mode', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'sql_mode')));
                 }
             }
         case 'pgsql': ;

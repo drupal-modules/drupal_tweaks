@@ -26,13 +26,13 @@ function db_tweaks_get_mysql_configuration($raw = FALSE) {
     // get actual variables from configuration
     $mysql_conf['sql_big_selects']['conf'] = variable_get('db_tweaks_mysql_sql_big_selects', $mysql_conf['sql_big_selects']['mysql']);
     $mysql_conf['max_join_size']['conf'] = variable_get('db_tweaks_mysql_max_join_size', $mysql_conf['max_join_size']['mysql']);
-    $mysql_conf['max_allowed_packet']['conf'] = variable_get('db_tweaks_mysql_max_allowed_packet', $mysql_conf['max_allowed_packet']['mysql']/1024/1024);
+    $mysql_conf['max_allowed_packet']['conf'] = variable_get('db_tweaks_mysql_max_allowed_packet', (int)format_size($mysql_conf['max_allowed_packet']['mysql']));
     $mysql_conf['wait_timeout']['conf'] = variable_get('db_tweaks_mysql_wait_timeout', $mysql_conf['wait_timeout']['mysql']);
     $mysql_conf['sql_mode']['conf'] = implode(',', variable_get('db_tweaks_mysql_sql_mode', array()));
     if ($raw) {
-      $mysql_conf['max_allowed_packet']['conf']  *= 1024*1024;
+      $mysql_conf['max_allowed_packet']['conf']  = parse_size($mysql_conf['max_allowed_packet']['conf']);
     } else { // if not set to RAW, then convert numbers to human format
-      $mysql_conf['max_allowed_packet']['mysql'] /= 1024*1024;
+      $mysql_conf['max_allowed_packet']['mysql'] = format_size($mysql_conf['max_allowed_packet']['mysql']);
     }
     return $mysql_conf;
 }
