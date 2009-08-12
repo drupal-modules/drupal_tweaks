@@ -48,7 +48,8 @@ function db_tweaks_boot() {
             /* LOAD INCLUDES */
             include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
             include_once './includes/path.inc';   // for arg() called from menu_get_item()
-            include_once './includes/menu.inc';   // for menu_get_item() called from magic_cache_cache_key()
+            include_once './includes/menu.inc';   // for menu_get_item()
+            include_once './includes/unicode.inc';   // for drupal_strtolower() called from parse_size()
             module_load_include('inc', 'db_tweaks'); // load additional function from included file
 
             /* LOAD DB SETTINGS */
