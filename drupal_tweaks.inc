@@ -73,14 +73,14 @@ function drupal_tweaks_report_module_issues($verbose = TRUE, $all = TRUE) {
   $modules = array();
   foreach ($files as $path => $file) {
     if (array_key_exists($file->name, $modules)) {
-      drupal_set_message(t('Duplicated modules detected (%module1 and %module2)! Please remove one of those.', array('%module1' => $duplicates[0], '%module2' => $duplicates[1])), 'error');
+      drupal_set_message(t('Duplicated modules detected (%module1 and %module2)! Please remove one of those.', array('%module1' => $path, '%module2' => $modules[$file->name])), 'error');
       $res[] = array($path, $modules[$file->name]);
       if ($all == FALSE) {
         break;
       }
     } else {
       if (!file_exists($path)) {
-          drupal_set_message(t('Missing module detected (%module1)! <a href="!url">Clearing the cache</a> is recommenced.', array('%module1' => $duplicates[0], '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'error');
+          drupal_set_message(t('Missing module detected (%module1)! <a href="!url">Clearing the cache</a> is recommenced.', array('%module1' => $path, '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'error');
       }
       $modules[$file->name] = $path;
     }
