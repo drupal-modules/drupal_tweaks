@@ -96,17 +96,6 @@ function drupal_tweaks_menu() {
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 4,
   );
-  /* TWEAKS MODULE PAGE */
-  $items['admin/drupal_tweaks/module_tweaks'] = array(
-    'title' => 'Tweaks',
-    'description' => t('Tweaks settings for Drupal modules.'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('drupal_tweaks_general_tweaks_form'),
-    'access arguments' => array('administer drupal_tweaks'),
-    'file' => 'includes/drupal_tweaks.admin.tweaks.inc',
-    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-    'weight' => 5,
-  );
 
   /* PHP SETTINGS PAGE */
   $items['admin/drupal_tweaks/php'] = array(
@@ -117,7 +106,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.php.inc', 
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-    'weight' => 6,
+    'weight' => 5,
   );
 
   if (module_exists('db_tweaks')) {
@@ -131,9 +120,21 @@ function drupal_tweaks_menu() {
       'file' => 'db_tweaks.admin.inc', 
       'file path' => drupal_get_path('module', 'db_tweaks'), 
       'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-      'weight' => 7,
+      'weight' => 6,
     );
   }
+
+  /* TWEAKS MODULE PAGE */
+  $items['admin/drupal_tweaks/module_tweaks'] = array(
+    'title' => 'Tweaks',
+    'description' => t('Tweaks settings for Drupal modules.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_general_tweaks_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.tweaks.inc',
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
+    'weight' => 7,
+  );
 
   /* SETTINGS PAGE */
   $items['admin/drupal_tweaks/settings'] = array(
@@ -251,7 +252,7 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
         // Invoke hook_views_default_views for all modules.
         foreach (module_implements('views_default_views') as $module) {
           $default_views = module_invoke($module, 'views_default_views');
-          $view_names = array_keys($default_views);
+          $view_names = $default_views ? array_keys($default_views) : array();
           foreach ($view_names as $view_name) {
             if (array_key_exists($view_name, $form['#parameters'][1]['views'])) {
               $desc = &$form['#parameters'][1]['views'][$view_name]->description;
