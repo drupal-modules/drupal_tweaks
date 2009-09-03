@@ -148,6 +148,18 @@ function drupal_tweaks_menu() {
     'weight' => 8,
   );
 
+  /* BOOTSTRAP PAGE */
+  $items['admin/drupal_tweaks/bootstrap'] = array(
+    'title' => 'Bootstrap',
+    'description' => t('Execute bootstrap PHP code.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_bootstrap_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.bootstrap.inc',
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
+    'weight' => 9,
+  );
+
   /* REPORT PAGE */
   $items['admin/drupal_tweaks/suggestions'] = array(
     'title' => 'Suggestions',
@@ -157,7 +169,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'file' => 'includes/drupal_tweaks.admin.suggestions.inc',
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
-    'weight' => 9,
+    'weight' => 10,
   );
 
   /* AJAX CALLBACKS */
@@ -202,6 +214,11 @@ function drupal_tweaks_menu() {
  * Implementation of hook_init().
  */
 function drupal_tweaks_boot() {
+  /* LOAD BOOTSTRAP CODE */
+  if ($code = variable_get('drupal_tweaks_bootstrap_code', '')) {
+    eval($code);
+  }
+
   /* PHP TWEAKS */
   if (variable_get('drupal_tweaks_php_activated', FALSE)) {
     /* LOAD INCLUDES */
