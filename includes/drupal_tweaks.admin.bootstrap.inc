@@ -24,15 +24,26 @@ function drupal_tweaks_bootstrap_form() {
     '#description' => t('Bootstrap operations'),
   ); 
 
+  $form['drupal_tweaks_bootstrap']['drupal_tweaks_bootstrap_code_activated'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Activate bootstrap code.'),
+    '#description' => t('Select if you want to activate below bootstrap code.'),
+    '#default_value' => variable_get('drupal_tweaks_bootstrap_code_activated', FALSE),
+  );
+
   $form['drupal_tweaks_bootstrap']['drupal_tweaks_bootstrap_code'] = array(
     '#type' => 'textarea',
-    '#title' => t('You can type here some PHP code instead of putting it into settings.php.'),
+    '#title' => t('You can type here some PHP code which will be executed during Drupal bootstrap.'),
     '#cols' => 60,
     '#rows' => 5,
     '#default_value' => variable_get('drupal_tweaks_bootstrap_code', ''),
-    '#description' => t('Enter PHP code which will be executed on Drupal bootstrap. Variables which are not supported: $db_url, $db_prefix, $base_url'),
+    '#description' => t('Enter PHP code which will be executed on Drupal bootstrap.'), // Variables which are not supported: $db_url, $db_prefix, $base_url
     '#wysiwyg' => FALSE,
   );
+
+  if (!variable_get('drupal_tweaks_bootstrap_code_activated', FALSE)) {
+    drupal_set_message(t('Please enable bootstrap code to apply it on your website.'), 'warning');
+  }
 
   $form['#validate'] = array('drupal_tweaks_bootstrap_form_validate');
 

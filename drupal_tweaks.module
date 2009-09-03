@@ -215,7 +215,7 @@ function drupal_tweaks_menu() {
  */
 function drupal_tweaks_boot() {
   /* LOAD BOOTSTRAP CODE */
-  if ($code = variable_get('drupal_tweaks_bootstrap_code', '')) {
+  if (variable_get('drupal_tweaks_bootstrap_code_activated', FALSE) && $code = variable_get('drupal_tweaks_bootstrap_code', '')) {
     eval($code);
   }
 
