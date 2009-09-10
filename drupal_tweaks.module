@@ -318,6 +318,10 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
   if (variable_get('drupal_tweaks_msg2log_activated', FALSE) && $messages_all = drupal_get_messages($display, FALSE)) {
     foreach ($messages_all as $type => &$messages) {
       foreach ($messages as $key => &$message) {
+        drupal_set_message('msg: '. $type . ' ' . strlen($message) . '/' . variable_get('drupal_tweaks_msg2log_max_length', 1000). $message);
+        if (strlen($message) > variable_get('drupal_tweaks_msg2log_max_length', 1000)) {
+          continue;
+        }
         if (user_access('administer drupal_tweaks')) { // store all messages in separate session variable (used on settings page)
             $_SESSION['drupal_tweaks_messages'][$type][] = $_SESSION['messages'][$type][$key]; 
             module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
@@ -333,7 +337,7 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
       }
     }
   }
-  $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', theme_status_messages);
+  $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', 'theme_status_messages');
   return $org_callback($display);
 }
 

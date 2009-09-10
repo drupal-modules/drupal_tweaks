@@ -50,6 +50,14 @@ function drupal_tweaks_msgs_settings_form() {
     '#default_value' => variable_get('drupal_tweaks_msg2log_activated', FALSE),
   );
 
+  $form['drupal_tweaks_msgs']['msg2log']['drupal_tweaks_msg2log_max_length'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum length of the message to check for rules.'),
+    '#description' => t('If you have to high, it could slow your website when you have long messages.'),
+    '#default_value' => variable_get('drupal_tweaks_msg2log_max_length', 1000),
+    '#size' => 5,
+  );
+
   /* ERROR MESSAGES */
   foreach (array('error', 'warning', 'status') as $type) {
     $form['drupal_tweaks_msgs']['msg2log'][$type] = array(
@@ -69,9 +77,10 @@ function drupal_tweaks_msgs_settings_form() {
     );
 
     if (!empty($_SESSION['drupal_tweaks_messages'][$type])) {
-      list($passed_test_msgs, $failed_test_msgs) = drupal_tweaks_msgs_get_test_msgs($type, variable_get('drupal_tweaks_msgs_' . $type . '_regex', implode("\n", drupal_tweaks_msg2log_settings_default_regex_rules($type))), $_SESSION['drupal_tweaks_messages']);
+      list($passed_test_msgs, $failed_test_msgs, $msgs_toolong) = drupal_tweaks_msgs_get_test_msgs($type, variable_get('drupal_tweaks_msgs_' . $type . '_regex', implode("\n", drupal_tweaks_msg2log_settings_default_regex_rules($type))), $_SESSION['drupal_tweaks_messages']);
       $test_msgs = !empty($passed_test_msgs) ? t('PASSED:') . "\n" . implode("\n", $passed_test_msgs) . "\n\n" : '';
-      $test_msgs .= !empty($failed_test_msgs) ? t('FAILED:') . "\n" . implode("\n", $failed_test_msgs) : '';
+      $test_msgs .= !empty($failed_test_msgs) ? t('FAILED:') . "\n" . implode("\n", $failed_test_msgs) . "\n\n" : '';
+      $test_msgs .= !empty($msgs_toolong) ? t('TOO LONG:') . "\n" . implode("\n", $msgs_toolong) : '';
     }
     if (variable_get('drupal_tweaks_msg2log_activated', FALSE)) {
       $form['drupal_tweaks_msgs']['msg2log'][$type]['drupal_tweaks_msgs_' . $type . '_regex_test'] = array(
@@ -135,8 +144,9 @@ function drupal_tweaks_msgs_get_test_msgs($type, $rules = NULL, $msgs = array())
   foreach ($msgs[$type] as $key => &$message) {
     $rule_passed = drupal_tweaks_msg2log_check_rule($message, $type) ? TRUE : FALSE;
     $rule_passed ? $res_passed[] = $message : $res_failed[] = $message;
+    strlen($message) > variable_get('drupal_tweaks_msg2log_max_length', 1000) ? $res_toolong[] = $message : NULL;
   }
-  return array($res_passed, $res_failed);
+  return array($res_passed, $res_failed, $res_toolong);
 }
 
 
