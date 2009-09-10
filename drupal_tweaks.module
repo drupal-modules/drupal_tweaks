@@ -318,7 +318,6 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
   if (variable_get('drupal_tweaks_msg2log_activated', FALSE) && $messages_all = drupal_get_messages($display, FALSE)) {
     foreach ($messages_all as $type => &$messages) {
       foreach ($messages as $key => &$message) {
-        drupal_set_message('msg: '. $type . ' ' . strlen($message) . '/' . variable_get('drupal_tweaks_msg2log_max_length', 1000). $message);
         if (strlen($message) > variable_get('drupal_tweaks_msg2log_max_length', 1000)) {
           continue;
         }
