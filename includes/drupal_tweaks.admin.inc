@@ -111,6 +111,9 @@ function drupal_tweaks_general_op_form_submit($form, &$form_state) {
         if (!module_exists($module_disable)) {
           drupal_set_message(t('Module %module successfully disabled.', array('%module' => $module_disable)));
           cache_clear_all();
+          drupal_clear_css_cache();
+          drupal_clear_js_cache();
+          actions_synchronize(); // Synchronize to catch any actions that were added or removed. 
         } else {
           drupal_set_message(t('Unknown error on disabling %module module.', array('%module' => $module_disable)), 'error');
         }
