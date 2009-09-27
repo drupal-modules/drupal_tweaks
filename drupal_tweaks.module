@@ -235,6 +235,7 @@ function drupal_tweaks_boot() {
         // update mysql settings if necessary
         if ($var_values['conf'] <> $var_values['php']) {
             if (!ini_set($var_name, $var_values['conf'])) {
+              include_once './includes/theme.inc';   // for theme() called from t()
               drupal_set_message(t('Cannot set variable `%variable` to `%value` in your PHP configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])). t('<br>') . t('Probably you do not have proper privileges.'), 'error');
               variable_set($var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
             }
