@@ -62,7 +62,6 @@ function drupal_tweaks_php_settings_form() {
       '#default_value' => $php_conf['upload_max_filesize']['php'],
       '#size' => 10,
       '#maxlength' => 8,
-      '#field_suffix' => t('MB'),
   ); 
 
   if (!variable_get('drupal_tweaks_php_activated', FALSE)) {

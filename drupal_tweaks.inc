@@ -170,3 +170,32 @@ function drupal_tweaks_module_check_db_changes($module_name) {
   }
 }
 
+/**
+ * Return current backtrace
+ */
+function drupal_tweaks_get_backtrace() {
+  $backtrace = debug_backtrace(TRUE);
+  if (is_array($backtrace)) {
+    array_shift($backtrace); // remove this function from array
+    array_shift($backtrace); // remove drupal_tweaks_watchdog
+    array_shift($backtrace); // remove call_user_func_array(module.inc:450)
+    array_shift($backtrace); // remove module_invoke(bootstrap.inc:839)
+    array_shift($backtrace); // remove watchdog(common.inc:619)
+    array_shift($backtrace); // drupal_error_handler(genmod.install:326) 
+    foreach ($backtrace as $index => $function) {
+        $function_name = $function['function'];
+        $line = $backtrace[$index]['line'];
+        $filename = basename($backtrace[$index]['file']);
+        $args = empty($function['args']) || is_string($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
+        $args = strlen($args) > variable_get('drupal_tweaks_backtrace_log_arg_max_length', 20) ? '...' : $args;
+        $buffer .= "$function_name($args)[$filename:$line] <=";
+    }
+    $buffer .= 'index.php';
+  }
+  if (empty($buffer)) {
+    $buffer = 'n/a';
+  }
+  return $buffer;
+}
+
+

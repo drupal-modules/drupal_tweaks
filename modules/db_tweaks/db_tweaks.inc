@@ -32,7 +32,7 @@ function db_tweaks_get_mysql_configuration($raw = FALSE) {
     if ($raw) {
       $mysql_conf['max_allowed_packet']['conf']  = parse_size($mysql_conf['max_allowed_packet']['conf']);
     } else { // if not set to RAW, then convert numbers to human format
-      $mysql_conf['max_allowed_packet']['mysql'] = format_size($mysql_conf['max_allowed_packet']['mysql']);
+      $mysql_conf['max_allowed_packet']['mysql'] = format_size($mysql_conf['max_allowed_packet']['mysql'], $langcode = NULL);
     }
     return $mysql_conf;
 }

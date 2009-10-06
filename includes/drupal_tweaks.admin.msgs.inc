@@ -50,14 +50,6 @@ function drupal_tweaks_msgs_settings_form() {
     '#default_value' => variable_get('drupal_tweaks_msg2log_activated', FALSE),
   );
 
-  $form['drupal_tweaks_msgs']['msg2log']['drupal_tweaks_msg2log_max_length'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum length of the message to check for rules.'),
-    '#description' => t('If you have to high, it could slow your website when you have long messages.'),
-    '#default_value' => variable_get('drupal_tweaks_msg2log_max_length', 1000),
-    '#size' => 5,
-  );
-
   /* ERROR MESSAGES */
   foreach (array('error', 'warning', 'status') as $type) {
     $form['drupal_tweaks_msgs']['msg2log'][$type] = array(
@@ -144,7 +136,7 @@ function drupal_tweaks_msgs_get_test_msgs($type, $rules = NULL, $msgs = array())
   foreach ($msgs[$type] as $key => &$message) {
     $rule_passed = drupal_tweaks_msg2log_check_rule($message, $type) ? TRUE : FALSE;
     $rule_passed ? $res_passed[] = $message : $res_failed[] = $message;
-    strlen($message) > variable_get('drupal_tweaks_msg2log_max_length', 1000) ? $res_toolong[] = $message : NULL;
+    $res_toolong[] = $message;
   }
   return array($res_passed, $res_failed, $res_toolong);
 }
