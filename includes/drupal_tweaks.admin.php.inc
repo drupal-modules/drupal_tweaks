@@ -41,7 +41,7 @@ function drupal_tweaks_php_settings_form() {
   );
   $form['php']['drupal_tweaks_php_memory_limit'] = array(
       '#type' => 'textfield',
-      '#title' => t('Default PHP memory limit.'),
+      '#title' => t('Default PHP memory limit (memory_limit)'),
       '#default_value' => $php_conf['memory_limit']['php'],
       '#size' => 20,
       '#maxlength' => 20,
@@ -49,19 +49,12 @@ function drupal_tweaks_php_settings_form() {
   ); 
   $form['php']['drupal_tweaks_php_max_execution_time'] = array(
       '#type' => 'textfield',
-      '#title' => t('Default maximum execution time for php scripts.'),
+      '#title' => t('Default maximum execution time for php scripts (max_execution_time)'),
       '#default_value' => $php_conf['max_execution_time']['php'],
       '#size' => 10,
       '#maxlength' => 8,
-      '#description' => t('For how long PHP script should be executed, before it will be terminated.'),
+      '#description' => t('For how long PHP script should be executed, before it will be terminated. You can not change this setting with ini_set() when running in safe mode.'),
       '#field_suffix' => t('sec'),
-  ); 
-  $form['php']['drupal_tweaks_php_upload_max_filesize'] = array(
-      '#type' => 'textfield',
-      '#title' => t('The maximum size of an uploaded file (upload_max_filesize).'),
-      '#default_value' => $php_conf['upload_max_filesize']['php'],
-      '#size' => 10,
-      '#maxlength' => 8,
   ); 
 
   if (!variable_get('drupal_tweaks_php_activated', FALSE)) {
@@ -83,18 +76,12 @@ function drupal_tweaks_php_settings_form_validate($form, &$form_state) {
   // get actual variables from configuration
   $max_execution_time = $php_conf['max_execution_time']['conf'] = $form_state['values']['drupal_tweaks_php_max_execution_time'];
   $memory_limit = $php_conf['memory_limit']['conf'] = $form_state['values']['drupal_tweaks_php_memory_limit'];
-  $upload_max_filesize = $php_conf['upload_max_filesize']['conf'] = $form_state['values']['drupal_tweaks_php_upload_max_filesize'];
 
   // validate PHP memory_limit
   if (!is_numeric(parse_size($memory_limit)) && parse_size($memory_limit) <= 0) {
       form_set_error('drupal_tweaks_php_memory_limit', t('The PHP memory_limit limit must be a number and greater than 0 (current limit is: %size).', array('%size' => $php_conf['memory_limit']['php'])));
   } else if (parse_size($memory_limit) < parse_size(DRUPAL_MINIMUM_PHP_MEMORY_LIMIT)) {
       form_set_error('drupal_tweaks_php_memory_limit', t('To prevent breaking your website, it is strictly recommended that PHP memory_limit should be greater than %min_memory_limit (current limit is: %size).', array('%size' => $php_conf['memory_limit']['php'], '%min_memory_limit' => DRUPAL_MINIMUM_PHP_MEMORY_LIMIT)));
-  }
-
-  // validate PHP upload_max_filesize
-  if (!is_numeric(parse_size($upload_max_filesize)) && parse_size($upload_max_filesize) <= 1) {
-      form_set_error('drupal_tweaks_php_upload_max_filesize', t('The PHP upload_max_filesize limit must be a number and greater than 1 (current limit is: %size).', array('%size' => $php_conf['upload_max_filesize']['php'])));
   }
 
   // validate PHP max_execution_time
@@ -108,9 +95,9 @@ function drupal_tweaks_php_settings_form_validate($form, &$form_state) {
     foreach ($php_conf as $var_name => $var_values) {
         // update php settings if necessary
         if ($var_values['conf'] <> $var_values['php']) {
-            if (!ini_set($var_name, $var_values['conf'])) {
-              drupal_set_message(t('Cannot set variable `%variable` to `%value` in your PHP configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])). t('<br>') . t('Probably you do not have proper privileges.'), 'error');
-              variable_set($var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
+            if (!ini_set($var_name, parse_size($var_values['conf']))) {
+              form_set_error('drupal_tweaks_php_' . $var_name, t('Cannot set variable `%variable` to `%value` in your PHP configuration!', array('%variable' => $var_name, '%value' => $var_values['conf'])). t('<br>') . t('Probably you do not have proper privileges.'), 'error');
+              variable_set('drupal_tweaks_php_' . $var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
             }
         }
     }
