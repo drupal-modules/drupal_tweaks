@@ -29,14 +29,14 @@ function drupal_tweaks_general_tweaks_form() {
 
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_show'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show backtrace on error.'),
+    '#title' => t('Show backtrace on PHP errors.'),
     '#description' => t('Show backtrace under Drupal error messages. It will help you to diagnose what\'s the reason of the error.'),
     '#default_value' => variable_get('drupal_tweaks_backtrace_show', FALSE),
   );
 
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_log'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Log backtrace on error.'),
+    '#title' => t('Log backtrace on PHP errors.'),
     '#description' => t('Log backtrace on Drupal error messages. (Link: <a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
     '#default_value' => variable_get('drupal_tweaks_backtrace_show', TRUE),
   );
