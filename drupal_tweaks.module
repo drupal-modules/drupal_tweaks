@@ -354,26 +354,36 @@ function drupal_tweaks_watchdog(&$log) {
         switch ($msg_type) {
           case 'warning':
           case 'error':
-            if (variable_get('drupal_tweaks_backtrace_show', FALSE)) {
+            if (variable_get('drupal_tweaks_backtrace_php_show', FALSE)) {
               module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
-              $bt_code = "<br>\nBacktrace: " . drupal_tweaks_get_backtrace();
-              $_SESSION['messages']['error'][count($_SESSION['messages']['error'])-1] .= $bt_code;
-            } else if (variable_get('drupal_tweaks_backtrace_log', TRUE)) {
+              drupal_tweaks_show_backtrace();
+            }
+            if (variable_get('drupal_tweaks_backtrace_php_log', TRUE)) {
               module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
-              $bt_code = "<br>\nBacktrace: " . drupal_tweaks_get_backtrace();
-              watchdog('backtrace', $log['message'] . ' ' . $bt_code, $log['variables']);
+              drupal_tweaks_log_backtrace($log);
             }
           break;
           default:
         }
     break;
+    case 'access denied':
+    case 'page not found':
+      if (variable_get('drupal_tweaks_backtrace_error_pages_show', FALSE)) {
+        module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+        drupal_tweaks_show_backtrace();
+      }
+      if (variable_get('drupal_tweaks_backtrace_error_pages_log', FALSE)) {
+        module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+        drupal_tweaks_log_backtrace($log);
+      }
+    break;
     default:
   }
+  // drupal_set_message($log['type']);
 /*
     $log['user']->uid, $log['type'], $log['message'], serialize($log['variables']), $log['severity'], $log['link'], $log['request_uri'], $log['referer'], $log['ip'], $log['timestamp']);
 */
 }
-
 
 /**
  * Check rule for single message if user should see it

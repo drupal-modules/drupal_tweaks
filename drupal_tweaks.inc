@@ -176,6 +176,7 @@ function drupal_tweaks_get_backtrace() {
   $backtrace = debug_backtrace(TRUE);
   if (is_array($backtrace)) {
     array_shift($backtrace); // remove this function from array
+    array_shift($backtrace); // remove drupal_tweaks_show_backtrace/drupal_tweaks_log_backtrace from array
     array_shift($backtrace); // remove drupal_tweaks_watchdog
     array_shift($backtrace); // remove call_user_func_array(module.inc:450)
     array_shift($backtrace); // remove module_invoke(bootstrap.inc:839)
@@ -197,4 +198,21 @@ function drupal_tweaks_get_backtrace() {
   return $buffer;
 }
 
+/**
+ * Add backtrace to drupal_set_message
+ *
+ */
+function drupal_tweaks_show_backtrace() {
+    $bt_code = "<br>\nBacktrace: " . drupal_tweaks_get_backtrace();
+    $_SESSION['messages']['error'][count($_SESSION['messages']['error'])-1] .= $bt_code;
+}
+
+/**
+ * Log backtrace into Drupal watchdog
+ *
+ */
+function drupal_tweaks_log_backtrace($log) {
+    $bt_code = "<br>\nBacktrace: " . drupal_tweaks_get_backtrace();
+    watchdog('backtrace', t('Type: ') . $log['type'] . "\n<br>" . $log['message'] . ' ' . $bt_code, $log['variables']);
+}
 

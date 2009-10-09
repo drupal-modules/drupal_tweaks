@@ -27,18 +27,32 @@ function drupal_tweaks_general_tweaks_form() {
     '#collapsed' => FALSE,
   );
 
-  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_show'] = array(
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_php_show'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show backtrace on PHP errors.'),
     '#description' => t('Show backtrace under Drupal error messages. It will help you to diagnose what\'s the reason of the error.'),
-    '#default_value' => variable_get('drupal_tweaks_backtrace_show', FALSE),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_php_show', FALSE),
   );
 
-  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_log'] = array(
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_php_log'] = array(
     '#type' => 'checkbox',
     '#title' => t('Log backtrace on PHP errors.'),
     '#description' => t('Log backtrace on Drupal error messages. (Link: <a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
-    '#default_value' => variable_get('drupal_tweaks_backtrace_show', TRUE),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_php_log', TRUE),
+  );
+
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_error_pages_show'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show backtrace on Drupal error pages.'),
+    '#description' => t('Show backtrace under on Drupal error pages (like Permission Denied or Page Not Found page). It will help you to diagnose what\'s the reason of the error.'),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_error_pages_show', FALSE),
+  );
+
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_error_pages_log'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Log backtrace on Drupal error pages.'),
+    '#description' => t('Log backtrace on Drupal error pages (like Permission Denied or Page Not Found page). (Link: <a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_error_pages_log', FALSE),
   );
 
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_adv'] = array(
