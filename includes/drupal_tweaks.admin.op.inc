@@ -24,6 +24,18 @@ function drupal_tweaks_op_form() {
     '#collapsible' => TRUE,
   ); 
 
+  $form['drupal_tweaks']['all_cache'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('All Caches'),
+    '#description' => t('Clear all caches and rebuild the permissions.'),
+    '#collapsible' => TRUE,
+  ); 
+  $form['drupal_tweaks']['all_cache']['clear_cache'] = array(
+    '#type' => 'submit',
+    '#value' => t('Clear cached data and rebuild the permissions'),
+    '#submit' => array('drupal_tweaks_clear_all_caches'),
+  );
+
   $form['drupal_tweaks']['cache'] = array(
     '#type' => 'fieldset',
     '#title' => t('Cache'),
@@ -36,6 +48,21 @@ function drupal_tweaks_op_form() {
     '#submit' => array('drupal_tweaks_clear_cache_submit'),
     '#suffix' => print_r(drupal_tweaks_db_tables('cache%%', 'SELECT COUNT(*) FROM {}'),true), /* FIXME: any better format? */
   );
+
+  if (module_exists('views')) {
+    $form['drupal_tweaks']['cache_views'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Views Cache'),
+      '#description' => t('Views caches data about tables, modules and views available. By checking this box, Views caches will be rebuild.'),
+      '#collapsible' => TRUE,
+    ); 
+    $form['drupal_tweaks']['cache_views']['clear_cache'] = array(
+      '#type' => 'submit',
+      '#value' => t('Clear Views data'),
+      '#submit' => array('drupal_tweaks_clear_views_cache_submit'),
+      '#suffix' => print_r(drupal_tweaks_db_tables('cache_views%%', 'SELECT COUNT(*) FROM {}'),true), /* FIXME: any better format? */
+    );
+  }
 
   $form['drupal_tweaks']['perm'] = array(
     '#type' => 'fieldset',
@@ -81,7 +108,32 @@ function drupal_tweaks_rebuild_perm_confirm_submit($form, &$form_state) {
  */
 function drupal_tweaks_clear_cache_submit($form, &$form_state = array()) {
   drupal_flush_all_caches();
-  drupal_set_message(t('Caches cleared.'));
+  drupal_set_message(t('Caches has been cleared.'));
+  $form_state['redirect'] = 'admin/drupal_tweaks/op';
+  drupal_goto($form_state['redirect']);
+}
+
+/**
+ * Submit callback; clear Views caches.
+ *
+ * @ingroup forms
+ */
+function drupal_tweaks_clear_views_cache_submit($form, &$form_state = array()) {
+  views_invalidate_cache();
+  drupal_set_message(t('Views caches has been cleared.'));
+  $form_state['redirect'] = 'admin/drupal_tweaks/op';
+  drupal_goto($form_state['redirect']);
+}
+
+/**
+ * Submit callback; clear system caches.
+ *
+ * @ingroup forms
+ */
+function drupal_tweaks_clear_all_caches($form, &$form_state = array()) {
+  drupal_flush_all_caches();
+  node_access_rebuild(TRUE); // rebuild node permissions
+  drupal_set_message(t('All caches has been cleared.'));
   $form_state['redirect'] = 'admin/drupal_tweaks/op';
   drupal_goto($form_state['redirect']);
 }
