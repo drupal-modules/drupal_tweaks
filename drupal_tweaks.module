@@ -452,6 +452,9 @@ function drupal_tweaks_msg2log_settings_default_regex_rules($type) {
  */
 function drupal_tweaks_get_t() {
   $t = get_t();
+  include_once './includes/theme.inc';   // for theme() called from t() with watchdog enabled
+  include_once './includes/common.inc'; // for t() called from menu_get_item() AND drupal_get_path() called from module_load_include()
+  include_once './includes/file.inc'; // for file_scan_directory() called from drupal_system_listing() used by t()
   return function_exists($t) ? $t : 'drupal_tweaks_t';
 }
 

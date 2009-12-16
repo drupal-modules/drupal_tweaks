@@ -39,6 +39,12 @@ function drupal_tweaks_php_settings_form() {
     '#description' => t('Select if you want to enable above changes.'),
     '#default_value' => variable_get('drupal_tweaks_php_activated', FALSE),
   );
+  $form['php']['drupal_tweaks_override_lesser'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow to override current settings with lesser values.'),
+    '#description' => t('Select if you want to override current settings with lesser values. Activate only if you are know what you are doing.'),
+    '#default_value' => variable_get('drupal_tweaks_override_lesser', FALSE),
+  );
   $form['php']['drupal_tweaks_php_memory_limit'] = array(
       '#type' => 'textfield',
       '#title' => t('Default PHP memory limit (memory_limit)'),
@@ -46,6 +52,8 @@ function drupal_tweaks_php_settings_form() {
       '#size' => 20,
       '#maxlength' => 20,
       '#description' => t('Maximum memory limit. Some hosting providers could not allow you to change that. Examples: 20M, 128M'),
+      '#suffix' => t('Current %name is: %size', array('%name' => 'memory_limit', '%size' => $php_conf['memory_limit']['php'])) . ' '
+                 . t('Config %name is: %size', array('%name' => 'memory_limit', '%size' => $php_conf['memory_limit']['org'])),
   ); 
   $form['php']['drupal_tweaks_php_max_execution_time'] = array(
       '#type' => 'textfield',
@@ -55,6 +63,8 @@ function drupal_tweaks_php_settings_form() {
       '#maxlength' => 8,
       '#description' => t('For how long PHP script should be executed, before it will be terminated. You can not change this setting with ini_set() when running in safe mode.'),
       '#field_suffix' => t('sec'),
+      '#suffix' => t('Current %name is: %size', array('%name' => 'max_execution_time', '%size' => $php_conf['max_execution_time']['php'])) . ' '
+                 . t('Config %name is: %size', array('%name' => 'max_execution_time', '%size' => $php_conf['max_execution_time']['org'])),
   ); 
 
   if (!variable_get('drupal_tweaks_php_activated', FALSE)) {
@@ -82,13 +92,17 @@ function drupal_tweaks_php_settings_form_validate($form, &$form_state) {
       form_set_error('drupal_tweaks_php_memory_limit', t('The PHP memory_limit limit must be a number and greater than 0 (current limit is: %size).', array('%size' => $php_conf['memory_limit']['php'])));
   } else if (parse_size($memory_limit) < parse_size(DRUPAL_MINIMUM_PHP_MEMORY_LIMIT)) {
       form_set_error('drupal_tweaks_php_memory_limit', t('To prevent breaking your website, it is strictly recommended that PHP memory_limit should be greater than %min_memory_limit (current limit is: %size).', array('%size' => $php_conf['memory_limit']['php'], '%min_memory_limit' => DRUPAL_MINIMUM_PHP_MEMORY_LIMIT)));
+  } else if (!variable_get('drupal_tweaks_override_lesser', FALSE) && (int)$memory_limit < $php_conf['memory_limit']['org']) {
+      form_set_error('drupal_tweaks_php_memory_limit', t('Can\'t override %name variable with lesser value of %user_size (config value: %size).', array('%size' => $php_conf['memory_limit']['org'], '%user_size' => $memory_limit, '%name' => 'memory_limit')));
   }
 
   // validate PHP max_execution_time
   if (!is_numeric($max_execution_time) || ($max_execution_time <= 0)) {
       form_set_error('drupal_tweaks_php_max_execution_time', t('The max_execution_time must be a number and greater than 0 (current timeout is: %size).', array('%size' => $php_conf['max_execution_time']['php'])));
   } else if ((int)$max_execution_time < (int)DRUPAL_MINIMUM_MAX_EXECUTION_TIME) {
-      form_set_error('drupal_tweaks_php_max_execution_time', t('To prevent breaking your website, it is strictly recommended that PHP max_execution_time should be greater than %min_max_execution_time (current limit is: %size).', array('%size' => $php_conf['memory_limit']['php'], '%min_max_execution_time' => DRUPAL_MINIMUM_PHP_MEMORY_LIMIT)));
+      form_set_error('drupal_tweaks_php_max_execution_time', t('To prevent breaking your website, it is strictly recommended that PHP max_execution_time should be greater than %min_max_execution_time (current limit is: %size).', array('%size' => $php_conf['max_execution_time']['php'], '%min_max_execution_time' => DRUPAL_MINIMUM_PHP_MEMORY_LIMIT)));
+  } else if (!variable_get('drupal_tweaks_override_lesser', FALSE) && (int)$max_execution_time < $php_conf['max_execution_time']['org']) {
+      form_set_error('drupal_tweaks_php_max_execution_time', t('Can\'t override %name variable with lesser value of %user_size (config value: %size).', array('%size' => $php_conf['max_execution_time']['org'], '%user_size' => $max_execution_time, '%name' => 'max_execution_time')));
   }
   if (!form_get_errors()) {
     /* validate PHP */

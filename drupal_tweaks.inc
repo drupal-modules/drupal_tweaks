@@ -14,7 +14,8 @@
 /**
  * Get PHP configuration
  */
-function drupal_tweaks_get_php_configuration($raw = FALSE) {
+function drupal_tweaks_get_php_configuration($raw = FALSE, $name = NULL) {
+    static $php_conf_org = array();
     $php_conf = array();
     // get actual variables from database
     $php_conf['max_execution_time']['php'] = (int)ini_get("max_execution_time");
@@ -24,13 +25,22 @@ function drupal_tweaks_get_php_configuration($raw = FALSE) {
     // get actual variables from configuration
     $php_conf['max_execution_time']['conf'] = variable_get('drupal_tweaks_php_max_execution_time', $php_conf['max_execution_time']['php']);
     $php_conf['memory_limit']['conf'] = variable_get('drupal_tweaks_php_memory_limit', $php_conf['memory_limit']['php']);
+
+    if (!$php_conf_org) {
+      $php_conf_org['max_execution_time']['php'] = $php_conf['max_execution_time']['php'];
+      $php_conf_org['memory_limit']['php'] = $php_conf['memory_limit']['php'];
+    }
+    // get original variables from configuration
+    $php_conf['max_execution_time']['org'] = $php_conf_org['max_execution_time']['php'];
+    $php_conf['memory_limit']['org'] = $php_conf_org['memory_limit']['php'];
+
     if ($raw) {
     } else { // if not set to RAW, then convert numbers to human format
       $php_conf['memory_limit']['conf']  = parse_size($php_conf['memory_limit']['conf']);
       $php_conf['upload_max_filesize']['conf']  = parse_size($php_conf['upload_max_filesize']['conf']);
       // memory_limit is already in human format
     }
-    return $php_conf;
+    return $name ? $php_conf[$name] : $php_conf;
 }
 
 /**
@@ -182,6 +192,7 @@ function drupal_tweaks_get_backtrace() {
     array_shift($backtrace); // remove module_invoke(bootstrap.inc:839)
     array_shift($backtrace); // remove watchdog(common.inc:619)
     array_shift($backtrace); // drupal_error_handler(genmod.install:326) 
+    $buffer = '';
     foreach ($backtrace as $index => $function) {
         $function_name = $function['function'];
         $line = $backtrace[$index]['line'];
