@@ -352,6 +352,7 @@ function drupal_tweaks_watchdog(&$log) {
     case 'php':
         $msg_type = $log['variables']['%error'];
         switch ($msg_type) {
+          case 'user warning':
           case 'warning':
           case 'error':
             if (variable_get('drupal_tweaks_backtrace_php_show', FALSE)) {
