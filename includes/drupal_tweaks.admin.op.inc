@@ -78,6 +78,23 @@ function drupal_tweaks_op_form() {
     '#suffix' => print_r(drupal_tweaks_get_perm_details(), true), /* FIXME: any better format? */
   ); 
 
+  $form['drupal_tweaks']['cron'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Cron'),
+    '#description' => t('Cron operations'),
+    '#collapsible' => TRUE,
+  ); 
+
+  $cron_semaphore = variable_get('cron_semaphore', FALSE);
+  $form['drupal_tweaks']['cron']['release_semaphore'] = array(
+    '#type' => 'submit',
+    '#value' => t('Release cron semaphore'),
+    '#description' => t('Use this option if you experiencing problems with cron.'),
+    '#submit' => array('drupal_tweaks_release_cron_semaphore_submit'),
+    '#suffix' =>  $cron_semaphore ? sprintf(t('Cron run on %s'), date('r', $cron_semaphore)) : t('No problems detected with cron semaphore.'),
+    '#disabled' => !$cron_semaphore,
+  );
+
   module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
   drupal_tweaks_op_cache_messages(); // Defined in drupal_tweaks.inc
 
