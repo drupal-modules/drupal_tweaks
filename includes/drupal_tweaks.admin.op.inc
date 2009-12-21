@@ -147,6 +147,18 @@ function drupal_tweaks_clear_views_cache_submit($form, &$form_state = array()) {
  *
  * @ingroup forms
  */
+function drupal_tweaks_release_cron_semaphore_submit($form, &$form_state = array()) {
+  variable_del('cron_semaphore');
+  drupal_set_message(t('Cron semaphore cleared.'));
+  $form_state['redirect'] = 'admin/drupal_tweaks/op';
+  drupal_goto($form_state['redirect']);
+}
+
+/**
+ * Submit callback; clear system caches.
+ *
+ * @ingroup forms
+ */
 function drupal_tweaks_clear_all_caches($form, &$form_state = array()) {
   drupal_flush_all_caches();
   node_access_rebuild(TRUE); // rebuild node permissions
