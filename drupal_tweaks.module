@@ -257,7 +257,6 @@ function drupal_tweaks_init() {
  * Implementation of hook_form_alter().
  */
 function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
-  //drupal_set_message($form_id);
   /* MODULE TWEAKS */
   switch ($form_id) {
     case 'node_admin_content':
@@ -289,7 +288,25 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
         } 
       }
       break;
+    case 'block_admin_display_form':
+      if (variable_get('drupal_tweaks_block_tweak', TRUE)) {
+        $form['#after_build'][] = 'drupal_tweaks_block_tweak';
+      }
+      break;
   }
+}
+
+/**
+ * Implementation of after_build callback
+ */
+function drupal_tweaks_block_tweak($form, $form_state) {
+  foreach ($form as $block_name => $block_data) {
+    if (is_array($block_data)) {
+      $module_name = $block_data['module']['#value'];
+      $form[$block_name]['info']['#suffix'] .= ' ' . sprintf(t('(module: %s)'), $module_name);
+    }
+  }
+  return $form;
 }
 
 /**

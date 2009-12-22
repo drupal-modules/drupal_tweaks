@@ -20,7 +20,7 @@ function drupal_tweaks_op_form() {
 
   $form['drupal_tweaks'] = array(
     '#type' => 'fieldset',
-    '#title' => t('All rebuild and flush operations in one place.'),
+    '#title' => t('All rebuild and flush operations in one place'),
     '#collapsible' => TRUE,
   ); 
 

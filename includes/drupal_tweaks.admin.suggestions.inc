@@ -49,7 +49,7 @@ function drupal_tweaks_report_form() {
 
 
   if ($no_problems) {
-    drupal_set_message(t('No problem detected.'));
+    drupal_set_message(t('No issues detected.'));
   }
   return $form;
 }

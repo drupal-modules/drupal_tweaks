@@ -78,14 +78,15 @@ function drupal_tweaks_general_tweaks_form() {
     '#collapsed' => FALSE,
   );
 
-  $module_name = 'Filter';
-  $form['drupal_tweaks_modules']['drupal_tweaks_filter'] = array(
+  /*
+  $module_name = 'filter';
+  $form['drupal_tweaks_modules']['drupal_tweaks_' . strtolower($module_name)] = array(
     '#type' => 'fieldset',
     '#title' => t('%module tweaks', array('%module' => $module_name)),
     '#description' => t('Tweaks for %module module.', array('%module' => $module_name)),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#disabled' => !module_exists('filter'),
+    '#disabled' => !module_exists($module_name),
   );
   $form['drupal_tweaks_modules']['drupal_tweaks_filter']['drupal_tweaks_filter_tweak'] = array(
     '#type' => 'checkbox',
@@ -95,22 +96,47 @@ function drupal_tweaks_general_tweaks_form() {
     '#disabled' => !module_exists('filter'),
   );
 
-  $module_name = 'Views';
-  $form['drupal_tweaks_modules']['drupal_tweaks_views'] = array(
+  $module_name = 'views';
+  $module_desc = t('If selected, you will see which View belongs to which module (Link: <a target=_blank href="!url">Views list</a>)', array('!url' => url('admin/build/views')));
+  $form['drupal_tweaks_modules']['drupal_tweaks_' . strtolower($module_name)] = array(
     '#type' => 'fieldset',
     '#title' => t('%module tweaks', array('%module' => $module_name)),
     '#description' => t('Tweaks for %module module.', array('%module' => $module_name)),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#disabled' => !module_exists('views'),
+    '#disabled' => !module_exists($module_name),
   );
-  $form['drupal_tweaks_modules']['drupal_tweaks_views']['drupal_tweaks_views_tweak'] = array(
+  $form['drupal_tweaks_modules']['drupal_tweaks_' . strtolower($module_name)]['drupal_tweaks_' . strtolower($module_name) . '_tweak'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable tweaks for %module module.', array('%module' => $module_name)),
-    '#description' => t('If selected, you will see which View belongs to which module (Link: <a target=_blank href="!url">Views list</a>)', array('!url' => url('admin/build/views'))),
-    '#default_value' => variable_get('drupal_tweaks_views_tweak', module_exists('filter')),
-    '#disabled' => !module_exists('views'),
+    '#description' => $module_desc,
+    '#default_value' => variable_get('drupal_tweaks_' . strtolower($module_name) . '_tweak', module_exists($module_nam)),
+    '#disabled' => !module_exists($module_name),
   );
+*/
+
+  foreach (array(
+    'filter' => 'admin/settings/filters', 
+    'block' => 'admin/build/block', 
+    'views' => 'admin/build/views',
+      ) as $module_name => $module_path) {
+    $module_desc = t('If selected, you will see which %module belongs to which module (List: <a target=_blank href="!url">%module list</a>)', array('%module' => $module_name, '!url' => url($module_path)));
+    $form['drupal_tweaks_modules']['drupal_tweaks_' . $module_name] = array(
+      '#type' => 'fieldset',
+      '#title' => t('%module tweaks', array('%module' => ucfirst($module_name))),
+      '#description' => t('Tweaks for %module module.', array('%module' => ucfirst($module_name))),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#disabled' => !module_exists($module_name),
+    );
+    $form['drupal_tweaks_modules']['drupal_tweaks_' . strtolower($module_name)]['drupal_tweaks_' . $module_name . '_tweak'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable tweaks for %module module.', array('%module' => ucfirst($module_name))),
+      '#description' => $module_desc,
+      '#default_value' => variable_get('drupal_tweaks_' . $module_name . '_tweak', module_exists($module_name)),
+      '#disabled' => !module_exists($module_name),
+    );
+  }
 
   return system_settings_form($form); 
 }
