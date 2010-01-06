@@ -197,6 +197,14 @@ function drupal_tweaks_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'includes/drupal_tweaks.ajax.inc',
   );
+  $items['admin/drupal_tweaks/autocomplete/users'] = array(
+    'title' => 'Find the node.',
+    'page callback' => 'drupal_tweaks_autocomplete_users',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
   $items['admin/drupal_tweaks/autocomplete/form_id'] = array(
     'title' => 'Find the node.',
     'page callback' => 'drupal_tweaks_autocomplete_form_id',
@@ -304,6 +312,7 @@ function drupal_tweaks_block_tweak($form, $form_state) {
     if (is_array($block_data)) {
       $module_name = $block_data['module']['#value'];
       $form[$block_name]['info']['#suffix'] .= ' ' . sprintf(t('(module: %s)'), $module_name);
+      // FIXME: Why #suffix generates: warning: preg_match() expects parameter 2 to be string, array given in includes/bootstrap.inc on line 777 ?
     }
   }
   return $form;

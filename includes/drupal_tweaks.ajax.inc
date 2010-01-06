@@ -37,7 +37,22 @@ function drupal_tweaks_autocomplete_nodes($string = '') {
   if ($string) {
     $result = db_query_range("SELECT nid, title FROM {node} WHERE title LIKE LOWER('%%%s%%') ORDER BY changed ASC", $string, 0, 10);
     while ($row = db_fetch_object($result)) {
-      $matches[$row->title] = check_plain($row->nid . ': ' . $row->title);
+      $matches[base_path() . 'node/' . $row->nid] = check_plain($row->nid . ': ' . $row->title);
+    }
+  }
+
+  drupal_json($matches);
+}
+
+/**
+ * Menu callback; Retrieve a JSON object containing autocomplete suggestions for existing users.
+ */
+function drupal_tweaks_autocomplete_users($string = '') {
+  $matches = array();
+  if ($string) {
+    $result = db_query_range("SELECT uid, name FROM {users} WHERE LOWER(name) LIKE LOWER('%s%%')", $string, 0, 10);
+    while ($user = db_fetch_object($result)) {
+      $matches[base_path() . 'user/' . $user->uid] = check_plain($user->uid . ': ' . $user->name);
     }
   }
 

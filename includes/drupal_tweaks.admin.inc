@@ -18,6 +18,7 @@
 function drupal_tweaks_general_op_form() {
   module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
   drupal_tweaks_include_shared_code();
+  drupal_add_js(drupal_get_path('module', 'drupal_tweaks') . '/js/drupal_tweaks.general.js');
 
   /* MODULE OPERATIONS */
   $form['drupal_tweaks_modules_op'] = array(
@@ -63,7 +64,7 @@ function drupal_tweaks_general_op_form() {
     '#autocomplete_path' => 'admin/drupal_tweaks/autocomplete/nodes',
     '#size' => 30,
     '#maxlength' => 60,
-    '#suffix' => t('Under development'),
+    //'#suffix' => t('Under development'),
   );
   $form['drupal_tweaks_user_op'] = array(
     '#type' => 'fieldset',
@@ -76,10 +77,10 @@ function drupal_tweaks_general_op_form() {
     '#type' => 'textfield',
     '#title' => t('Find the user.'),
     '#description' => t('Type user which you want to find.'),
-    '#autocomplete_path' => 'user/autocomplete',
+    '#autocomplete_path' => 'admin/drupal_tweaks/autocomplete/users',
     '#size' => 30,
     '#maxlength' => 60,
-    '#suffix' => t('Under development'),
+    //'#suffix' => t('Under development'),
   );
 
   return $form;
