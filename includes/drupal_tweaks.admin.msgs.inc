@@ -136,7 +136,11 @@ function drupal_tweaks_msgs_get_test_msgs($type, $rules = NULL, $msgs = array())
   foreach ($msgs[$type] as $key => &$message) {
     $rule_passed = drupal_tweaks_msg2log_check_rule($message, $type) ? TRUE : FALSE;
     $rule_passed ? $res_passed[] = $message : $res_failed[] = $message;
-    $res_toolong[] = $message;
+    /* activate it, if you want ignore too long messages
+      if (strlen($message) > 1000) {
+        $res_toolong[] = $message;
+      }
+   */
   }
   return array($res_passed, $res_failed, $res_toolong);
 }
