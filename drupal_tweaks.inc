@@ -197,7 +197,10 @@ function drupal_tweaks_get_backtrace() {
         $function_name = $function['function'];
         $line = $backtrace[$index]['line'];
         $filename = basename($backtrace[$index]['file']);
-        $args = empty($function['args']) || is_string($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
+        $args = NULL;
+        if (isset($function['args'])) {
+          $args = is_string($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
+        }
         $args = strlen($args) > variable_get('drupal_tweaks_backtrace_log_arg_max_length', 20) ? '...' : $args;
         $buffer .= "$function_name($args)[$filename:$line] <=";
     }
