@@ -373,7 +373,7 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
   return $org_callback($display);
 }
 
-function drupal_tweaks_watchdog(&$log) {
+function drupal_tweaks_watchdog($log) {
   switch ($log['type']) {
     case 'php':
         $msg_type = $log['variables']['%error'];
