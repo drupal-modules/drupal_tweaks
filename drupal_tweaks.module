@@ -309,10 +309,9 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
  */
 function drupal_tweaks_block_tweak($form, $form_state) {
   foreach ($form as $block_name => $block_data) {
-    if (is_array($block_data)) {
+    if (is_array($block_data) && $block_data['module']['#value']) {
       $module_name = $block_data['module']['#value'];
       $form[$block_name]['info']['#suffix'] .= ' ' . sprintf(t('(module: %s)'), $module_name);
-      // FIXME: Why #suffix generates: warning: preg_match() expects parameter 2 to be string, array given in includes/bootstrap.inc on line 777 ?
     }
   }
   return $form;
