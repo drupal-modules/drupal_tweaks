@@ -309,8 +309,7 @@ function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
  */
 function drupal_tweaks_block_tweak($form, $form_state) {
   foreach ($form as $block_name => $block_data) {
-    if (is_array($block_data) && $block_data['module']['#value']) {
-      $module_name = $block_data['module']['#value'];
+    if (is_array($block_data) && $module_name = $block_data['module']['#value']) {
       $form[$block_name]['info']['#suffix'] .= ' ' . sprintf(t('(module: %s)'), $module_name);
     }
   }
