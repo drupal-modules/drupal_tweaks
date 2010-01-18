@@ -52,8 +52,8 @@ function drupal_tweaks_php_settings_form() {
       '#size' => 20,
       '#maxlength' => 20,
       '#description' => t('Maximum memory limit. Some hosting providers could not allow you to change that. Examples: 20M, 128M'),
-      '#suffix' => t('Current %name is: %size', array('%name' => 'memory_limit', '%size' => $php_conf['memory_limit']['php'])) . ' '
-                 . t('Config %name is: %size', array('%name' => 'memory_limit', '%size' => $php_conf['memory_limit']['org'])),
+      '#suffix' => t('Current !name is: !size', array('!name' => 'memory_limit', '!size' => $php_conf['memory_limit']['php'])) . ' '
+                 . t('Config !name is: !size', array('!name' => 'memory_limit', '!size' => $php_conf['memory_limit']['org'])),
   ); 
   $form['php']['drupal_tweaks_php_max_execution_time'] = array(
       '#type' => 'textfield',
@@ -63,8 +63,8 @@ function drupal_tweaks_php_settings_form() {
       '#maxlength' => 8,
       '#description' => t('For how long PHP script should be executed, before it will be terminated. You can not change this setting with ini_set() when running in safe mode.'),
       '#field_suffix' => t('sec'),
-      '#suffix' => t('Current %name is: %size', array('%name' => 'max_execution_time', '%size' => $php_conf['max_execution_time']['php'])) . ' '
-                 . t('Config %name is: %size', array('%name' => 'max_execution_time', '%size' => $php_conf['max_execution_time']['org'])),
+      '#suffix' => t('Current !name is: !size', array('!name' => 'max_execution_time', '!size' => $php_conf['max_execution_time']['php'])) . ' '
+                 . t('Config !name is: !size', array('!name' => 'max_execution_time', '!size' => $php_conf['max_execution_time']['org'])),
   ); 
 
   if (!variable_get('drupal_tweaks_php_activated', FALSE)) {
