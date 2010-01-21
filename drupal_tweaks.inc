@@ -195,8 +195,8 @@ function drupal_tweaks_get_backtrace() {
     $buffer = '';
     foreach ($backtrace as $index => $function) {
         $function_name = $function['function'];
-        $line = $backtrace[$index]['line'];
-        $filename = basename($backtrace[$index]['file']);
+        $line = !empty($backtrace[$index]['line']) ? $backtrace[$index]['line'] : '?';
+        $filename = !empty($backtrace[$index]['file']) ? basename($backtrace[$index]['file']) : '?';
         $args = NULL;
         if (isset($function['args'])) {
           $args = is_string($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
