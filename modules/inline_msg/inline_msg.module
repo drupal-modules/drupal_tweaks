@@ -137,6 +137,7 @@ function inline_msg_form_alter(&$form, $form_state, $form_id) {
 function inline_msg_validate_form($form, &$form_state) {
   //form_set_error('body', 'bla bla bla');
   global $inline_msg_ids;
+  $inline_msg_ids = array();
   if ($form_errors = form_get_errors()) {
     foreach($form_errors as $field => $error_msg) {
       $field_name = (substr($field, 0, 6) == 'field_' && ( $field_data = explode('][', $field)) ) ? $field_data[0] : ( $field_data = $field );
