@@ -86,6 +86,7 @@ function drupal_tweaks_menu() {
     );
   }
 
+  /* MSGS PAGE */
   $items['admin/drupal_tweaks/msgs'] = array(
     'title' => 'Msgs',
     'description' => t('Configure drupal messages behaviour'),
@@ -96,6 +97,21 @@ function drupal_tweaks_menu() {
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 4,
   );
+
+  if (module_exists('inline_msg')) {
+    /* INLINE MSG PAGE */
+    $items['admin/drupal_tweaks/inline_msg'] = array(
+      'title' => 'Block',
+      'description' => t('Move validation messages above form elements.'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('inline_msg_admin_settings'),
+      'access arguments' => array('administer inline msg'),
+      'file' => 'inline_msg.admin.inc', 
+      'file path' => drupal_get_path('module', 'inline_msg'), 
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 3,
+    );
+  }
 
   /* PHP SETTINGS PAGE */
   $items['admin/drupal_tweaks/php'] = array(
@@ -366,9 +382,11 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
         unset($_SESSION['messages'][$type]);
       }
     }
+    drupal_alter('status_messages', $_SESSION['messages']);
   }
   $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', 'theme_status_messages');
-  return $org_callback($display);
+  $output = $org_callback($display);
+  return $output;
 }
 
 function drupal_tweaks_watchdog($log) {
