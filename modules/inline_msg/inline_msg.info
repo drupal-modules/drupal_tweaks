@@ -1,0 +1,6 @@
+name = Inline Msg
+description = Move validation messages above the form elements.
+package = Drupal Tweaks
+core = 6.x
+dependencies[] = drupal_tweaks
+
