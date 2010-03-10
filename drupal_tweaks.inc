@@ -64,7 +64,7 @@ function drupal_tweaks_op_cache_messages() {
   $menu_items = module_invoke_all('menu');
   drupal_alter('menu', $menu_items);
   if (count($menu_items) <> $count) {
-    drupal_set_message(t('Changes in menu items detected (%no1% items found instead of %no2%). Some menu items could be missing. <a href="!url">Clearing the cache</a> is recommenced.', array('%no1%' => count($menu_items), '%no2%' => $count, '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'warning');
+    drupal_set_message(t('Changes in menu items detected (%no1% items found instead of %no2%). Some menu items could be missing. <a href="!url">Clearing the cache</a> is recommended.', array('%no1%' => count($menu_items), '%no2%' => $count, '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'warning');
     $all_right = FALSE;
     return $all_right;
   }
@@ -92,7 +92,7 @@ function drupal_tweaks_report_module_issues($verbose = TRUE, $all = TRUE) {
       }
     } else {
       if (!file_exists($path)) {
-          drupal_set_message(t('Missing module detected (%module1)! <a href="!url">Clearing the cache</a> is recommenced.', array('%module1' => $path, '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'error');
+          drupal_set_message(t('Missing module detected (%module1)! <a href="!url">Clearing the cache</a> is recommended.', array('%module1' => $path, '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'error');
       }
       $modules[$file->name] = $path;
     }
