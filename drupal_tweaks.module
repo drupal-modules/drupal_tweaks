@@ -350,8 +350,21 @@ function drupal_tweaks_exit() {
  * Adds our own preprocess functions to some templates.
  */
 function drupal_tweaks_theme_registry_alter(&$items) {
-  variable_set('drupal_tweaks_status_messages_theme_callback', $items['status_messages']['function']); // FIXME: later we can restore it in case if it's different than default
-  $items['status_messages']['function'] = 'drupal_tweaks_msg2log_theme_status_messages'; // take over theme_status_messages
+  variable_set('drupal_tweaks_status_messages_theme_callback', $items['status_messages']); // FIXME: support for non-function messages
+  $items['status_messages_dt_org'] = $items['status_messages']; // make a copy of original
+  $items['status_messages']['function'] = 'theme_status_messages_dt'; // take over theme_status_messages
+  $items['status_messages'] = $items['status_messages_dt']; // override theme_status_messages
+}
+
+/**
+ * Implementation of hook_theme
+ */
+function drupal_tweaks_theme() {
+  return array(
+    'status_messages_dt' => array(
+      'arguments' => array('display' => NULL),
+    ),
+  );
 }
 
 /**
@@ -364,7 +377,7 @@ function drupal_tweaks_theme_registry_alter(&$items) {
  * @return
  *   A string containing the messages.
  */
-function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
+function theme_status_messages_dt($display = NULL) {
   if (variable_get('drupal_tweaks_msg2log_activated', FALSE) && $messages_all = drupal_get_messages($display, FALSE)) {
     foreach ($messages_all as $type => &$messages) {
       foreach ($messages as $key => &$message) {
@@ -384,8 +397,9 @@ function drupal_tweaks_msg2log_theme_status_messages($display = NULL) {
     }
     drupal_alter('status_messages', $_SESSION['messages']);
   }
-  $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', 'theme_status_messages');
-  $output = $org_callback($display);
+  // $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', array('function' => 'theme_status_messages'));
+  // $output = function_exists($org_callback['function']) ? $org_callback['function']($display) : $org_callback['function']($display);
+  $output = theme('status_messages_dt_org');
   return $output;
 }
 
