@@ -281,7 +281,6 @@ function drupal_tweaks_init() {
  * Implementation of hook_form_alter().
  */
 function drupal_tweaks_form_alter(&$form, $form_state, $form_id) {
-implode();
   /* MODULE TWEAKS */
   switch ($form_id) {
     case 'node_admin_content':
