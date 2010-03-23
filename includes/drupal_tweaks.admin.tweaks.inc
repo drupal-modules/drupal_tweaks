@@ -64,9 +64,19 @@ function drupal_tweaks_general_tweaks_form() {
 
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_adv']['drupal_tweaks_backtrace_log_arg_max_length'] = array(
     '#type' => 'textfield',
-    '#title' => t('Maximum length of function arguments in backtrace.'),
-    '#description' => t('If you want to debug website and check which arguments has been passed into function, try to increase it.'),
-    '#default_value' => variable_get('drupal_tweaks_backtrace_log_arg_max_length', 20),
+    '#title' => t('Maximum length of function arguments in backtrace'),
+    '#description' => t('If you want to debug website and check which arguments has been passed into function, try to increase it. Set 0 for unlimited length.'),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_log_arg_max_length', 100),
+    '#disabled' => !(variable_get('drupal_tweaks_backtrace_php_show', TRUE) || variable_get('drupal_tweaks_backtrace_error_pages_show', FALSE)),
+    '#size' => 5,
+  );
+
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_adv']['drupal_tweaks_backtrace_log_arg_max_length_log'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum length of function arguments in backtrace log'),
+    '#description' => t('Set 0 for unlimited length.'),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_log_arg_max_length_log', 0),
+    '#disabled' => !(variable_get('drupal_tweaks_backtrace_php_log', TRUE) || variable_get('drupal_tweaks_backtrace_error_pages_log', FALSE)),
     '#size' => 5,
   );
 

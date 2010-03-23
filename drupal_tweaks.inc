@@ -50,7 +50,6 @@ function drupal_tweaks_op_cache_messages() {
   $all_right = TRUE;
   /* check menu_router table for changes */
   $res = db_query('SELECT path, access_callback, page_callback, file FROM {menu_router}');
-  $count = 0;
   $menu_router = array();
   while ($row = db_fetch_array($res)) {
     $menu_router[$row['path']] = array(
@@ -59,12 +58,13 @@ function drupal_tweaks_op_cache_messages() {
       'page_callback' => next($row),
       'file' => next($row),
     );
-    $count++;
   }
-  $menu_items = module_invoke_all('menu');
+  $menu_items = menu_router_build();
   drupal_alter('menu', $menu_items);
-  if (count($menu_items) <> $count) {
-    drupal_set_message(t('Changes in menu items detected (%no1% items found instead of %no2%). Some menu items could be missing. <a href="!url">Clearing the cache</a> is recommended.', array('%no1%' => count($menu_items), '%no2%' => $count, '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'warning');
+//var_dump(array_keys($menu_router)); exit;
+//var_dump(array_keys($menu_items)); exit;
+  if (count($menu_items) <> count($menu_router)) {
+    drupal_set_message(t('Changes in menu items detected (%no1% items found instead of %no2%). Some menu items could be missing. <a href="!url">Clearing the cache</a> is recommended.', array('%no1%' => count($menu_items), '%no2%' => count($menu_router), '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'warning');
     $all_right = FALSE;
     return $all_right;
   }
@@ -182,7 +182,7 @@ function drupal_tweaks_module_check_db_changes($module_name) {
 /**
  * Return current backtrace
  */
-function drupal_tweaks_get_backtrace() {
+function drupal_tweaks_get_backtrace($limit = 100, $nl = "<br>\n", $tab = ".") {
   $backtrace = debug_backtrace(TRUE);
   if (is_array($backtrace)) {
     array_shift($backtrace); // remove this function from array
@@ -193,6 +193,7 @@ function drupal_tweaks_get_backtrace() {
     array_shift($backtrace); // remove watchdog(common.inc:619)
     array_shift($backtrace); // drupal_error_handler(genmod.install:326) 
     $buffer = '';
+    $counter = 0;
     foreach ($backtrace as $index => $function) {
         $function_name = $function['function'];
         $line = !empty($backtrace[$index]['line']) ? $backtrace[$index]['line'] : '?';
@@ -201,9 +202,11 @@ function drupal_tweaks_get_backtrace() {
         if (isset($function['args'])) {
           $args = is_string($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
         }
-        $args = strlen($args) > variable_get('drupal_tweaks_backtrace_log_arg_max_length', 20) ? '...' : $args;
-        $buffer .= "$function_name($args)[$filename:$line] <=";
+        $args = (!empty($limit) && strlen($args) > $limit) ? gettype($args) : $args;
+        $buffer .= str_repeat($tab, $counter++);
+        $buffer .= "$function_name($args)[$filename:$line];" . $nl;
     }
+    $buffer .= str_repeat($tab, $counter++);
     $buffer .= 'index.php';
   }
   if (empty($buffer)) {
@@ -217,7 +220,7 @@ function drupal_tweaks_get_backtrace() {
  *
  */
 function drupal_tweaks_show_backtrace() {
-    $bt_code = "<br>\nBacktrace: " . drupal_tweaks_get_backtrace();
+    $bt_code = "<br>\nBacktrace:<br>\n" . drupal_tweaks_get_backtrace(variable_get('drupal_tweaks_backtrace_log_arg_max_length', 1000));
     $_SESSION['messages']['error'][count($_SESSION['messages']['error'])-1] .= $bt_code;
 }
 
@@ -226,7 +229,7 @@ function drupal_tweaks_show_backtrace() {
  *
  */
 function drupal_tweaks_log_backtrace($log) {
-    $bt_code = "<br>\nBacktrace: " . drupal_tweaks_get_backtrace();
+    $bt_code = "<br>\nBacktrace:<br>\n" . drupal_tweaks_get_backtrace(variable_get('drupal_tweaks_backtrace_log_arg_max_length_log', 1000));
     watchdog('backtrace', t('Type: ') . $log['type'] . "\n<br>" . $log['message'] . ' ' . $bt_code, $log['variables']);
 }
 
