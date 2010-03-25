@@ -68,6 +68,8 @@ function db_tweaks_settings_form() {
               '#description' => $sql_big_selects_description,
               '#default_value' => $mysql_conf['sql_big_selects']['mysql'],
               '#options' => array('ON' => t('ON'), 'OFF' => t('OFF')),
+              '#suffix' => t('Current !name is: !value', array('!name' => 'SQL_BIG_SELECTS', '!value' => (bool)$mysql_conf['sql_big_selects']['mysql'])) . ' '
+                         . t('Config !name is: !value', array('!name' => 'SQL_BIG_SELECTS', '!value' => (bool)$mysql_conf['sql_big_selects']['conf'])),
           ); 
           $form['db_tweaks']['mysql']['db_tweaks_mysql_max_join_size'] = array(
               '#type' => 'textfield',
@@ -79,6 +81,8 @@ function db_tweaks_settings_form() {
               '#description' => $max_join_size_description,
               '#disabled' => $mysql_conf['sql_big_selects']['mysql'] == 'ON',
               '#field_suffix' => t('joins'),
+              '#suffix' => t('Current !name is: !value', array('!name' => 'MAX_JOIN_SIZE', '!value' => $mysql_conf['max_join_size']['mysql'])) . ' '
+                         . t('Config !name is: !value', array('!name' => 'MAX_JOIN_SIZE', '!value' => $mysql_conf['max_join_size']['conf'])),
           ); 
           $form['db_tweaks']['mysql']['db_tweaks_mysql_max_allowed_packet'] = array(
               '#type' => 'textfield',
@@ -87,6 +91,8 @@ function db_tweaks_settings_form() {
               '#size' => 20,
               '#maxlength' => 20,
               '#description' => $max_allowed_packet_description,
+              '#suffix' => t('Current !name is: !value', array('!name' => 'MAX_ALLOWED_PACKET', '!value' => $mysql_conf['max_allowed_packet']['mysql'])) . ' '
+                         . t('Config !name is: !value', array('!name' => 'MAX_ALLOWED_PACKET', '!value' => $mysql_conf['max_allowed_packet']['conf'])),
           ); 
           $form['db_tweaks']['mysql']['db_tweaks_mysql_wait_timeout'] = array(
               '#type' => 'textfield',
@@ -96,6 +102,8 @@ function db_tweaks_settings_form() {
               '#maxlength' => 8,
               '#description' => t('Defines the number of seconds a mysql thread waits in idle state before mysql preempts and kills it'),
               '#field_suffix' => t('sec'),
+              '#suffix' => t('Current !name is: !value', array('!name' => 'wait_timeout', '!value' => $mysql_conf['wait_timeout']['mysql'])) . ' '
+                         . t('Config !name is: !value', array('!name' => 'wait_timeout', '!value' => $mysql_conf['wait_timeout']['conf'])),
           ); 
           $options = db_tweaks_get_mysql_modes();
           $form['db_tweaks']['mysql']['db_tweaks_mysql_sql_mode'] = array(
@@ -105,6 +113,8 @@ function db_tweaks_settings_form() {
               '#description' => $sql_mode_description,
               '#default_value' => $mysql_conf['sql_mode']['conf'],
               '#options' => $options,
+              '#suffix' => t('Current !name is: !value', array('!name' => 'SQL mode', '!value' => $mysql_conf['sql_mode']['mysql'])) . ' '
+                         . t('Config !name is: !value', array('!name' => 'SQL mode', '!value' => $mysql_conf['sql_mode']['conf'])),
           ); 
       case 'pgsql':
   }
