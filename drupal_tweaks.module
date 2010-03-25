@@ -30,7 +30,7 @@ function drupal_tweaks_menu() {
     'position' => 'left',
     'weight' => 0,
     'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('access administration pages'),
+    'access arguments' => array('administer drupal_tweaks'),
     'file' => 'system.admin.inc',
     'file path' => drupal_get_path('module', 'system'), 
   ); 
