@@ -238,6 +238,10 @@ function drupal_tweaks_menu() {
  * Implementation of hook_init().
  */
 function drupal_tweaks_boot() {
+  /* check if cache has been cleared */
+  global $drupal_tweaks_cache_cleared;
+  $drupal_tweaks_cache_cleared = !(bool)cache_get('theme_registry:' . variable_get('theme_default','none'), 'cache');
+
   /* LOAD BOOTSTRAP CODE */
   if (variable_get('drupal_tweaks_bootstrap_code_activated', FALSE) && $code = variable_get('drupal_tweaks_bootstrap_code', '')) {
     eval($code);
@@ -275,6 +279,18 @@ function drupal_tweaks_boot() {
  */
 function drupal_tweaks_init() {
   drupal_tweaks_set_message(); // show bootstrap messages
+  /* if cache has been cleared, execute hook_clear_cache_alter */
+  global $drupal_tweaks_cache_cleared;
+  if ($drupal_tweaks_cache_cleared) {
+    module_invoke_all('clear_cache_alter');
+  }
+}
+
+/**
+ * Implementation of hook_clear_cache_alter().
+ */
+function drupal_tweaks_clear_cache_alter() {
+    variable_del('drupal_tweaks_menu_items_no'); // reset menu items couter
 }
 
 /**

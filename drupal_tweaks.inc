@@ -49,22 +49,11 @@ function drupal_tweaks_get_php_configuration($raw = FALSE, $name = NULL) {
 function drupal_tweaks_op_cache_messages() {
   $all_right = TRUE;
   /* check menu_router table for changes */
-  $res = db_query('SELECT path, access_callback, page_callback, file FROM {menu_router}');
-  $menu_router = array();
-  while ($row = db_fetch_array($res)) {
-    $menu_router[$row['path']] = array(
-      key($row) => current($row),
-      'access_callback' => next($row),
-      'page_callback' => next($row),
-      'file' => next($row),
-    );
-  }
-  $menu_items = menu_router_build();
-  drupal_alter('menu', $menu_items);
-//var_dump(array_keys($menu_router)); exit;
-//var_dump(array_keys($menu_items)); exit;
-  if (count($menu_items) <> count($menu_router)) {
-    drupal_set_message(t('Changes in menu items detected (%no1% items found instead of %no2%). Some menu items could be missing. <a href="!url">Clearing the cache</a> is recommended.', array('%no1%' => count($menu_items), '%no2%' => count($menu_router), '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'warning');
+  $router_items = drupal_tweaks_menu_router_build();
+
+  variable_get('drupal_tweaks_menu_items_no', 0) == 0 ? variable_set('drupal_tweaks_menu_items_no', count($router_items)) : NULL;
+  if (count($router_items) <> variable_get('drupal_tweaks_menu_items_no', 0)) {
+    drupal_set_message(t('Changes in menu items detected (%no1% items found instead of %no2%). Some menu items could be missing. <a href="!url">Clearing the cache</a> is recommended.', array('%no1%' => count($router_items), '%no2%' => variable_get('drupal_tweaks_menu_items_no', 0), '!url' => url('admin/drupal_tweaks/op/clear_cache'))), 'warning');
     $all_right = FALSE;
     return $all_right;
   }
@@ -73,6 +62,31 @@ function drupal_tweaks_op_cache_messages() {
   /* check node_access table for changes */
   /* TODO */
   return $all_right;
+}
+
+/**
+ * Faster version of menu_router_build for diagnostics purposes
+ */
+function drupal_tweaks_menu_router_build($reset = FALSE) {
+  static $menu;
+
+  if (empty($menu) || $reset) {
+    // We need to manually call each module so that we can know which module
+    // a given item came from.
+    $callbacks = array();
+    foreach (module_implements('menu') as $module) {
+      $router_items = call_user_func($module .'_menu');
+      if (isset($router_items) && is_array($router_items)) {
+        foreach (array_keys($router_items) as $path) {
+          $router_items[$path]['module'] = $module;
+        }
+        $callbacks = array_merge($callbacks, $router_items);
+      }
+    }
+    // drupal_alter('menu', $callbacks);
+    $menu = ($callbacks);
+  }
+  return $menu;
 }
 
 /**
@@ -231,5 +245,34 @@ function drupal_tweaks_show_backtrace() {
 function drupal_tweaks_log_backtrace($log) {
     $bt_code = "<br>\nBacktrace:<br>\n" . drupal_tweaks_get_backtrace(variable_get('drupal_tweaks_backtrace_log_arg_max_length_log', 1000));
     watchdog('backtrace', t('Type: ') . $log['type'] . "\n<br>" . $log['message'] . ' ' . $bt_code, $log['variables']);
+}
+
+/**
+ * Return flat array with list of paths like:
+ * array[0] = '';
+ * array[0]->foo[2] = '';
+ *
+ * @param array/object $arrResult object to dump
+ * @param bool $return when TRUE, return variable instead of showing it
+ * @param string $vname variable name
+ * @return string of paths
+ */
+function _var_dump_flat($arrResult, $return = FALSE, $vname = "array", $nl = "<br>\n", $deep = 0, &$buff = ''){
+    while(list($key, $value) = each($arrResult)){
+        if (is_array($value) || is_object($value)){
+            $key_ = is_object($arrResult) ? "->$key" : "['$key']";
+            $buff .= _var_dump_flat($value, $return, $vname . $key_, $nl, $deep++);
+        } else {
+            $key_ = is_object($arrResult) ? "->$key" : "['$key']";
+            for ($i=0; $i<count($value); $i++){
+                $buff .= '$'.$vname . $key_ . ' = ' . ($value ? "'$value'" : 'NULL') . ";" . $nl;
+            }
+        }
+    }
+    if ($return) {
+        return $buff;
+    } else {
+        echo $buff;
+    }
 }
 
