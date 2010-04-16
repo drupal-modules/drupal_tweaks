@@ -12,6 +12,12 @@
  */
 
 /**
+ * Implementation of hook_install().
+ */
+function drupal_tweaks_install() {
+}
+
+/**
  * Implementation of hook_uninstall().
  */
 function drupal_tweaks_uninstall() {
