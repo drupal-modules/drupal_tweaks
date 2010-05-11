@@ -424,6 +424,7 @@ function drupal_tweaks_watchdog($log) {
     case 'php':
         $msg_type = $log['variables']['%error'];
         switch ($msg_type) {
+          case 'recoverable fatal error':
           case 'user warning':
           case 'warning':
           case 'error':
