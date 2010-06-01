@@ -21,7 +21,7 @@
  *    Rafal Wieczorek <kenorb@gmail.com>
  */
 
-define(REGEX_HELP, "http://php.net/manual/en/book.pcre.php");
+define('REGEX_HELP', "http://php.net/manual/en/book.pcre.php");
 
 /**
  * Menu callback for the settings form.
@@ -145,4 +145,107 @@ function drupal_tweaks_msgs_get_test_msgs($type, $rules = NULL, $msgs = array())
   return array($res_passed, $res_failed, $res_toolong);
 }
 
+/**
+ * Menu callback; listing of msg rules
+ *
+ */
+function drupal_tweaks_msg_rules_form(&$form_state, $type_name = 'page') {
+
+  // Gather type information.
+  $type = content_types($type_name);
+  $fields = $type['fields'];
+  $field_types = _content_field_types();
+
+  $extra = $type['extra'];
+  $groups = $group_options = $group_types = array();
+  if (module_exists('fieldgroup')) {
+    $groups = fieldgroup_groups($type['type']);
+    $group_types = fieldgroup_types();
+    $group_options = _fieldgroup_groups_label($type['type']);
+    // Add the ability to group under the newly created row.
+    $group_options['_add_new_group'] = '_add_new_group';
+  }
+
+  // Store the default weights as we meet them, to be able to put the
+  //'add new' rows after them.
+  $weights = array();
+
+  $form = array(
+    '#tree' => TRUE,
+    '#type_name' => $type['type'],
+    '#fields' => array_keys($fields),
+    '#groups' => array_keys($groups),
+    '#extra' => array_keys($extra),
+    '#field_rows' => array(),
+    '#group_rows' => array(),
+  );
+
+  // Fields.
+  foreach ($fields as $name => $field) {
+    $weight = $field['widget']['weight'];
+    $form[$name] = array(
+      'label' => array('#value' => check_plain($field['widget']['label'])),
+      'field_name' => array('#value' => $field['field_name']),
+      'type' => array('#value' => t($field_types[$field['type']]['label'])),
+      'configure' => array('#value' => l(t('Edit'), 'admin/drupal_tweaks/msgs/'. $type['url_str'] .'/fields/'. $field['field_name'])),
+      'remove' => array('#value' => l(t('Remove'), 'admin/drupal_tweaks/msgs/'. $type['url_str'] .'/fields/'. $field['field_name'] .'/remove')),
+      'weight' => array('#type' => 'textfield', '#default_value' => $weight, '#size' => 3),
+      'parent' => array('#type' => 'select', '#options' => $group_options, '#default_value' => ''),
+      'prev_parent' => array('#type' => 'hidden', '#value' => ''),
+      'hidden_name' => array('#type' => 'hidden', '#default_value' => $field['field_name']),
+      '#leaf' => TRUE,
+      '#row_type' => 'field',
+      'field' =>  array('#type' => 'value', '#value' => $field),
+    );
+    if ($field['locked']) {
+      $form[$name]['configure'] = array('#value' => t('Locked'));
+      $form[$name]['remove'] = array();
+      $form[$name]['#disabled_row'] = TRUE;
+    }
+    $form['#field_rows'][] = $name;
+    $weights[] = $weight;
+  }
+
+  // Additional row : add new field.
+  $weight = max($weights) + 1;
+module_load_include('admin.inc', 'content', 'includes/content');
+/* INCLUDE */
+  $msg_type_options = array('status', 'warning', 'error', 'all');
+  $action_type_options = array('hide', 'replace');
+  $widget_type_options = content_widget_type_options(NULL, TRUE);
+
+    $name = '_add_msg_rule';
+    $form[$name] = array(
+      'label' => array(
+        '#type' => 'textfield',
+        '#size' => 15,
+        '#description' => t('Name'),
+      ),
+      'rule_name' => array(
+        '#type' => 'textfield',
+        '#size' => 25,
+        '#description' => t('RegEx rule (ie. @has been submitted@).'),
+      ),
+      'type' => array(
+        '#type' => 'radios',
+        '#options' => $msg_type_options,
+        '#description' => theme('advanced_help_topic', 'content', 'fields') . t('Type of the message.'),
+      ),
+      'action' => array(
+        '#type' => 'radios',
+        '#options' => $action_type_options,
+        '#description' => t('Action to apply for specified rule.'),
+      ),
+      'weight' => array('#type' => 'textfield', '#default_value' => $weight, '#size' => 3),
+      'parent' => array('#type' => 'select', '#options' => $group_options, '#default_value' => ''),
+      'hidden_name' => array('#type' => 'hidden', '#default_value' => $name),
+      '#leaf' => TRUE,
+      '#add_new' => TRUE,
+      '#row_type' => 'add_new_field',
+    );
+    $form['#field_rows'][] = $name;
+
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  return $form;
+}
 

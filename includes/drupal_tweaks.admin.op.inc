@@ -95,7 +95,6 @@ function drupal_tweaks_op_form() {
     '#disabled' => !$cron_semaphore,
   );
 
-  module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
   drupal_tweaks_op_cache_messages(); // Defined in drupal_tweaks.inc
 
   return system_settings_form($form); 
