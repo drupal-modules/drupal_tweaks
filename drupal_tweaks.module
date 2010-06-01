@@ -47,6 +47,18 @@ function drupal_tweaks_menu() {
   );
 
   /* OPERATION PAGE */
+  $items['admin/drupal_tweaks/modules'] = array(
+    'title' => 'Modules',
+    'description' => t('Module manager.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupal_tweaks_modules_form'),
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.modules.inc',
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  /* OPERATION PAGE */
   $items['admin/drupal_tweaks/op'] = array(
     'title' => 'Operations',
     'description' => t('Flush operations (clear cache, rebuild permissions, etc.)'),
@@ -97,6 +109,20 @@ function drupal_tweaks_menu() {
     'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
     'weight' => 4,
   );
+
+  /* MSGS PAGE */
+/* TODO:
+  $items['admin/drupal_tweaks/msgs_new'] = array(
+    'title' => 'Msgs',
+    'description' => t('Configure drupal messages behaviour'),
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('drupal_tweaks_msg_rules_form'), 
+    'access arguments' => array('administer drupal_tweaks'),
+    'file' => 'includes/drupal_tweaks.admin.msgs.inc', 
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
+*/
 
   if (module_exists('inline_msg')) {
     /* INLINE MSG PAGE */
@@ -376,9 +402,21 @@ function drupal_tweaks_theme_registry_alter(&$items) {
  * Implementation of hook_theme
  */
 function drupal_tweaks_theme() {
+  $path = drupal_get_path('module', 'drupal_tweaks') .'/theme';
   return array(
     'status_messages_dt' => array(
       'arguments' => array('display' => NULL),
+    ),
+    'drupal_tweaks_msg_rules_form' => array(
+      'template' => 'msg-rules-admin-form',
+      'file' => 'theme.inc',
+      'path' => $path,
+      'arguments' => array('form' => NULL),
+    ),
+    'drupal_tweaks_module_admin_modules' => array(
+      'file' => 'theme.inc',
+      'path' => $path,
+      'arguments' => array('form' => NULL),
     ),
   );
 }
