@@ -397,7 +397,7 @@ function _module_mass_update_helper($mname, $op) {
                 _module_mass_update_helper($mname, 'install');
                 break;
     }
-    if ($op <> 'reinstall') {
+    if ($op <> 'reinstall' && $op <> 'reenable') {
         drupal_set_message(t('Module: %module, Operation performed: %op.', array('%module' => $mname, '%op' => $op)));
     }
     return array('name' => $mname);
