@@ -191,6 +191,10 @@ function drupal_tweaks_module_check_db_changes($module_name, $reset = FALSE) {
   if ($perms = module_invoke($module_name, 'perm')) {
     drupal_set_message(t('%module: New %type items detected! (%data)', array('%module' => $module_name, '%type' => 'permission', '%data' => print_r($perms, true))));
   }
+  if ($schemas = module_invoke($module_name, 'schema')) {
+    drupal_set_message(t('%module: New database tables: %tname!', array('%module' => $module_name, '%tname' => print_r(array_keys($schemas), TRUE))));
+    cache_clear_all(NULL, 'cache_block');
+  }
 }
 
 /**
