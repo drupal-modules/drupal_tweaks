@@ -380,13 +380,20 @@ function _module_mass_update_helper($mname, $op) {
     switch ($op) {
         case 'disable':
                 module_disable(array($mname));
+                drupal_set_message(t('Module %module has been disabled.', array('%module' => $mname)));
             break;
         case 'install':
                 module_enable(array($mname));
+                drupal_set_message(t('Module %module has been enabled.', array('%module' => $mname)));
+                if (drupal_check_module($mname)) {
+                    drupal_install_modules(array($mname));
+                    drupal_set_message(t('Module %module has been installed.', array('%module' => $mname)));
+                }
             break;
         case 'uninstall':
                 _module_mass_update_helper($mname, 'disable');
                 drupal_uninstall_module($mname);
+                drupal_set_message(t('Module %module has been uninstalled.', array('%module' => $mname)));
                 break;
         case 'reenable':
                 _module_mass_update_helper($mname, 'disable');
@@ -396,9 +403,6 @@ function _module_mass_update_helper($mname, $op) {
                 _module_mass_update_helper($mname, 'uninstall');
                 _module_mass_update_helper($mname, 'install');
                 break;
-    }
-    if ($op <> 'reinstall' && $op <> 'reenable') {
-        drupal_set_message(t('Module: %module, Operation performed: %op.', array('%module' => $mname, '%op' => $op)));
     }
     return array('name' => $mname);
 }
