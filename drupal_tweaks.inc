@@ -173,10 +173,10 @@ function drupal_tweaks_msgs_give_advice($msg, $type) {
 /**
  * Check for changes provided by module and clear the caches
  */
-function drupal_tweaks_module_check_db_changes($module_name) {
+function drupal_tweaks_module_check_db_changes($module_name, $reset = FALSE) {
   if ($menus = module_invoke(array($module_name), 'menu')) {
     drupal_set_message(t('%module: New %type items detected!', array('%module' => $module_name, '%type' => 'menu')));
-    cache_clear_all(NULL, 'cache_menu');
+    cache_clear_all(NULL, 'cache_menu'); // the same as: menu_rebuild(); ?
   } else {
     drupal_tweaks_op_cache_messages();
   }

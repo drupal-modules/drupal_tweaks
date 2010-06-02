@@ -393,19 +393,34 @@ function _module_mass_update_helper($mname, $op) {
         case 'install':
                 module_enable(array($mname));
 
-                if (module_exists($module_enable)) {
-                  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
-                  drupal_set_message(t('Module %module has been successfully enabled.', array('%module' => $mname)));
-                  drupal_tweaks_module_check_db_changes($mname);
+                if (module_exists($mname)) {
+                    module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+                    drupal_set_message(t('Module %module has been successfully enabled.', array('%module' => $mname)));
+                    drupal_tweaks_module_check_db_changes($mname);
+
+                    include_once './includes/install.inc';
+                    if (drupal_get_installed_schema_version($mname) == SCHEMA_UNINSTALLED && drupal_check_module($mname)) {
+                        drupal_install_modules(array($mname));
+                        drupal_set_message(t('Module %module has been installed.', array('%module' => $mname)));
+                    }
+
+                    drupal_rebuild_theme_registry();
+                    node_types_rebuild();
+                    cache_clear_all('schema', 'cache');
+                    drupal_clear_css_cache();
+                    drupal_clear_js_cache();
+
+                    // Notify locale module about module changes, so translations can be
+                    // imported. This might start a batch, and only return to the redirect
+                    // path after that.
+                    module_invoke('locale', 'system_update', array($mname));
+
+                    // Synchronize to catch any actions that were added or removed.
+                    actions_synchronize();
                 } else {
                   drupal_set_message(t('Unknown error on enabling %module module.', array('%module' => $mname)), 'error');
                 }
 
-                if (drupal_check_module($mname)) {
-                    include_once './includes/install.inc';
-                    drupal_install_modules(array($mname));
-                    drupal_set_message(t('Module %module has been installed.', array('%module' => $mname)));
-                }
             break;
         case 'uninstall':
                 _module_mass_update_helper($mname, 'disable');
