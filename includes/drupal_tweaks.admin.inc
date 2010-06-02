@@ -20,35 +20,6 @@ function drupal_tweaks_general_op_form() {
   drupal_tweaks_include_shared_code();
   // drupal_add_js(drupal_get_path('module', 'drupal_tweaks') . '/js/drupal_tweaks.general.js'); // ?
 
-  /* MODULE OPERATIONS */
-  $form['drupal_tweaks_modules_op'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Module quick operations'),
-    '#description' => t('You can also do it manually on <a target=_blank href="!url">Module Page</a>.', array('!url' => url('admin/build/modules'))),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-  $form['drupal_tweaks_modules_op']['drupal_tweaks_enable_module'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Enable the module.'),
-    '#description' => t('Type which module you want to enable.'),
-    '#autocomplete_path' => 'admin/drupal_tweaks/autocomplete/disabled_modules',
-    '#size' => 30,
-    '#maxlength' => 60,
-  );
-  $form['drupal_tweaks_modules_op']['drupal_tweaks_disable_module'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Disable the module.'),
-    '#description' => t('Type which module you want to disable.'),
-    '#autocomplete_path' => 'admin/drupal_tweaks/autocomplete/enabled_modules',
-    '#size' => 30,
-    '#maxlength' => 60,
-  );
-  $form['drupal_tweaks_modules_op']['drupal_tweaks_module_submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
-
   /* NODE OPERATIONS */
   $form['drupal_tweaks_nodes_op'] = array(
     '#type' => 'fieldset',
