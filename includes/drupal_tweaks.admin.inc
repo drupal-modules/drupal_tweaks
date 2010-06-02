@@ -64,32 +64,6 @@ function drupal_tweaks_general_op_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   switch ($values['op']) {
     case t('Save'):
-      $module_enable = $values['drupal_tweaks_enable_module'];
-      $module_disable = $values['drupal_tweaks_disable_module'];
-
-      if (!empty($module_enable) && !module_exists($module_enable)) {
-        include_once './includes/install.inc';
-        drupal_install_modules(array($module_enable));
-        if (module_exists($module_enable)) {
-          module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
-          drupal_set_message(t('Module %module successfully enabled.', array('%module' => $module_enable)));
-          drupal_tweaks_module_check_db_changes($module_enable);
-        } else {
-          drupal_set_message(t('Unknown error on enabling %module module.', array('%module' => $module_enable)), 'error');
-        }
-      }
-      if (!empty($module_disable) && module_exists($module_disable)) {
-        module_disable(array($module_disable));
-        if (!module_exists($module_disable)) {
-          drupal_set_message(t('Module %module successfully disabled.', array('%module' => $module_disable)));
-          cache_clear_all();
-          drupal_clear_css_cache();
-          drupal_clear_js_cache();
-          actions_synchronize(); // Synchronize to catch any actions that were added or removed. 
-        } else {
-          drupal_set_message(t('Unknown error on disabling %module module.', array('%module' => $module_disable)), 'error');
-        }
-      }
     break;
   }
 }
