@@ -380,12 +380,29 @@ function _module_mass_update_helper($mname, $op) {
     switch ($op) {
         case 'disable':
                 module_disable(array($mname));
-                drupal_set_message(t('Module %module has been disabled.', array('%module' => $mname)));
+                if (!module_exists($module_disable)) {
+                  drupal_set_message(t('Module %module has been successfully disabled.', array('%module' => $mname)));
+                  cache_clear_all();
+                  drupal_clear_css_cache();
+                  drupal_clear_js_cache();
+                  actions_synchronize(); // Synchronize to catch any actions that were added or removed. 
+                } else {
+                  drupal_set_message(t('Unknown error on disabling %module module.', array('%module' => $mname)), 'error');
+                }
             break;
         case 'install':
                 module_enable(array($mname));
-                drupal_set_message(t('Module %module has been enabled.', array('%module' => $mname)));
+
+                if (module_exists($module_enable)) {
+                  module_load_include('inc', 'drupal_tweaks'); // load additional functions from included file
+                  drupal_set_message(t('Module %module has been successfully enabled.', array('%module' => $mname)));
+                  drupal_tweaks_module_check_db_changes($mname);
+                } else {
+                  drupal_set_message(t('Unknown error on enabling %module module.', array('%module' => $mname)), 'error');
+                }
+
                 if (drupal_check_module($mname)) {
+                    include_once './includes/install.inc';
                     drupal_install_modules(array($mname));
                     drupal_set_message(t('Module %module has been installed.', array('%module' => $mname)));
                 }
