@@ -10,6 +10,8 @@
  *
  */
 function inline_msg_menu() {
+  $items = array();
+/*
   if (!module_exists('drupal_tweaks')) {
     $items['admin/settings/inline_msg'] = array(
       'title' => 'Inline Msg',
@@ -20,6 +22,7 @@ function inline_msg_menu() {
       'file' => 'inline_msg.admin.inc', 
     );
   }
+*/
 
   return $items;
 }
@@ -46,7 +49,7 @@ function inline_msg_perm() {
 /**
  * Implementation of hook_status_messages_alter
  * 
- * See: drupal_tweaks_msg2log_theme_status_messages()
+ * See: theme_status_messages_dt()
  */
 function inline_msg_status_messages_alter(&$messages) {
   global $inline_msg_ids;

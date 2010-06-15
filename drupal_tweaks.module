@@ -126,17 +126,19 @@ function drupal_tweaks_menu() {
 
   if (module_exists('inline_msg')) {
     /* INLINE MSG PAGE */
+/* Nothing here at the moment
     $items['admin/drupal_tweaks/inline_msg'] = array(
-      'title' => 'Block',
+      'title' => 'Inline Msg',
       'description' => t('Move validation messages above form elements.'),
       'page callback' => 'drupal_get_form',
       'page arguments' => array('inline_msg_admin_settings'),
       'access arguments' => array('administer inline msg'),
       'file' => 'inline_msg.admin.inc', 
       'file path' => drupal_get_path('module', 'inline_msg'), 
-      'type' => MENU_LOCAL_TASK,
+      'type' => MENU_NORMAL_ITEM | MENU_LOCAL_TASK,
       'weight' => 3,
     );
+*/
   }
 
   /* PHP SETTINGS PAGE */
