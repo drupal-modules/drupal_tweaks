@@ -14,7 +14,7 @@
 /**
  * Minimum recommended value of MySQL max_packet_size limit.
  */
-define('DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET', '2M'); 
+define('DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET', '1M'); 
 
 /**
  * Implementation of hook_menu().

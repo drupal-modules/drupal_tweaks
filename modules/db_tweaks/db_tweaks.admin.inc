@@ -174,7 +174,7 @@ function db_tweaks_settings_form_validate($form, &$form_state) {
 
             // validate MAX_ALLOWED_PACKET
             if (parse_size($max_allowed_packet) <= parse_size(DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET)) {
-                form_set_error('db_tweaks_mysql_max_allowed_packet', t('The MAX_ALLOWED_PACKET limit must be a number and greater than %min_size (current size is: %size).', array('%min_size' => DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET, '%size' => $mysql_conf['max_allowed_packet']['mysql'])));
+                form_set_error('db_tweaks_mysql_max_allowed_packet', t('The %name limit must be a number and greater than %min_size (current size is: %size).', array('%name' => 'MAX_ALLOWED_PACKET', '%min_size' => DRUPAL_MINIMUM_MYSQL_MAX_ALLOWED_PACKET, '%size' => $mysql_conf['max_allowed_packet']['mysql'])));
             } else if (parse_size($mysql_conf['max_allowed_packet']['mysql']) <> parse_size($max_allowed_packet)) {
                 if (!db_tweaks_set_mysql_variable('max_allowed_packet', $max_allowed_packet)) {
                   form_set_error('db_tweaks_mysql_max_allowed_packet', t('Cannot change `%variable` in your database configuration! Probably you do not have proper privileges.', array('%variable' => 'max_allowed_packet')));
