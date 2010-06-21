@@ -462,22 +462,23 @@ function theme_status_messages_dt($display = NULL) {
 function drupal_tweaks_watchdog($log) {
   switch ($log['type']) {
     case 'php':
-        $msg_type = $log['variables']['%error'];
-        switch ($msg_type) {
-          case 'recoverable fatal error':
-          case 'user warning':
-          case 'warning':
-          case 'error':
-            if (variable_get('drupal_tweaks_backtrace_php_show', FALSE)) {
-              module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
-              drupal_tweaks_show_backtrace();
+        if ($msg_type = $log['variables']['%error']) {
+            switch ($msg_type) {
+              case 'recoverable fatal error':
+              case 'user warning':
+              case 'warning':
+              case 'error':
+                if (variable_get('drupal_tweaks_backtrace_php_show', FALSE)) {
+                  module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+                  drupal_tweaks_show_backtrace();
+                }
+                if (variable_get('drupal_tweaks_backtrace_php_log', TRUE)) {
+                  module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+                  drupal_tweaks_log_backtrace($log);
+                }
+              break;
+              default:
             }
-            if (variable_get('drupal_tweaks_backtrace_php_log', TRUE)) {
-              module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
-              drupal_tweaks_log_backtrace($log);
-            }
-          break;
-          default:
         }
     break;
     case 'access denied':
