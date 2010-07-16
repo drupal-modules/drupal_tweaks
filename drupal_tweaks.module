@@ -83,7 +83,7 @@ function drupal_tweaks_menu() {
     'access arguments' => array('administer drupal_tweaks'),
     'type' => MENU_CALLBACK,
   ); 
-  if (module_exists('db_tweaks')) {
+  if (module_exists('form2block')) {
     /* BLOCK PAGE */
     $items['admin/drupal_tweaks/block'] = array(
       'title' => 'Block',
