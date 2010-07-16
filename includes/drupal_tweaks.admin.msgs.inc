@@ -33,7 +33,7 @@ function drupal_tweaks_msgs_settings_form() {
   $form['drupal_tweaks_msgs'] = array(
     '#type' => 'fieldset',
     '#title' => t('Messages tweaks'),
-    '#description' => t('You can configure here different behaviours for messages.'),
+    '#description' => t('You can configure here different behaviours for messages.<br>Note that you have to activate message engine for other modules like Inline Msg, which uses hook_status_messages_alter'),
   ); 
 
   $form['drupal_tweaks_msgs']['msg2log'] = array(
@@ -45,7 +45,7 @@ function drupal_tweaks_msgs_settings_form() {
 
   $form['drupal_tweaks_msgs']['msg2log']['drupal_tweaks_msg2log_activated'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Activate message rules.'),
+    '#title' => t('Activate message tweaks'),
     '#description' => t('Select if you want to activate below log rules.'),
     '#default_value' => variable_get('drupal_tweaks_msg2log_activated', FALSE),
   );
