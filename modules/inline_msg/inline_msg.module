@@ -16,10 +16,10 @@ function inline_msg_menu() {
     $items['admin/settings/inline_msg'] = array(
       'title' => 'Inline Msg',
       'description' => t('Move validation messages above form elements.'),
-      'page callback' => 'drupal_get_form', 
-      'page arguments' => array('inline_msg_admin_settings'), 
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('inline_msg_admin_settings'),
       'access arguments' => array('administer inline msg'),
-      'file' => 'inline_msg.admin.inc', 
+      'file' => 'inline_msg.admin.inc',
     );
   }
 */
@@ -48,14 +48,14 @@ function inline_msg_perm() {
 
 /**
  * Implementation of hook_status_messages_alter
- * 
+ *
  * See: theme_status_messages_dt()
  */
 function inline_msg_status_messages_alter(&$messages) {
-    global $inline_msg_ids;
+    $inline_msg_ids = form_get_errors();
 
     if(!is_array($inline_msg_ids))
-        $inline_msg_ids = form_get_errors();
+        $inline_msg_ids = array();
 
     $js_code = "
         if (Drupal.jsEnabled) {
@@ -100,8 +100,7 @@ function inline_msg_status_messages_alter(&$messages) {
 
         $js2 .= "if(remove) $('.messages." . $type . "').eq(0).remove();";
     }
-    
+
     $js_code_all = $js_code . $js1 . $js2 . "\n})};";
     drupal_add_js($js_code_all, 'inline');
 }
-
