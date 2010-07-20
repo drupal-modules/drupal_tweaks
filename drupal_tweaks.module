@@ -257,6 +257,14 @@ function drupal_tweaks_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'includes/drupal_tweaks.ajax.inc',
   );
+  $items['admin/drupal_tweaks/autocomplete/filter_modules'] = array(
+    'title' => 'Filter the module.',
+    'page callback' => 'drupal_tweaks_filter_modules',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer drupal_tweaks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/drupal_tweaks.ajax.inc',
+  );
 
   return $items;
 }

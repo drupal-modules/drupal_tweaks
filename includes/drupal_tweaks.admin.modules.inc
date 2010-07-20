@@ -67,6 +67,99 @@ function drupal_tweaks_modules_filter_form() {
     $form['filters']['buttons']['reset'] = array('#type' => 'submit', '#value' => t('Reset'));
   }
 
+  $form['filters']['current'][] = array(
+     '#type' => 'textfield',
+     '#title' => t('Name contains'),
+     '#attributes' => array(
+      //'onkeydown' => "return filter_modules(this, event);",
+      'onkeyup' => "return filter_modules_keyup(this, event);",
+      'onblur' => "return filter_modules_blur(this);"
+      ),
+     '#description' => t('Type part of module name.'),
+     //'#autocomplete_path' => 'admin/drupal_tweaks/autocomplete/filter_modules',
+     '#size' => 30,
+     '#maxlength' => 60,
+   );
+
+  $js_code = "
+        function filter_modules_blur(input)
+        {
+            if (input.value.length > 0)
+                find_mod_matches(input.value);
+            else
+                set_mod_matches('table-row');
+        }
+
+        function filter_modules_keyup(input, e)
+        {
+            if (!e) {
+                e = window.event;
+            }
+            switch (e.keyCode) {
+                case 16: // shift
+                case 17: // ctrl
+                case 18: // alt
+                case 20: // caps lock
+                case 33: // page up
+                case 34: // page down
+                case 35: // end
+                case 36: // home
+                case 37: // left arrow
+                case 38: // up arrow
+                case 39: // right arrow
+                case 40: // down arrow
+                case 9:  // tab
+                case 13: // enter
+                case 27: // esc
+                    return true;
+
+                default: // all other keys
+                    if (input.value.length > 0)
+                        find_mod_matches(input.value);
+                    else
+                        set_mod_matches('table-row');
+                    return true;
+            }
+        }
+
+        function set_mod_matches(display)
+        {
+            $('tbody').children('tr').each(function() {
+                $(this).css('display', display);
+            });
+        }
+
+        var timer = null;
+
+        function find_mod_matches(value)
+        {
+            if (this.timer) {
+                clearTimeout(this.timer);
+            }
+            this.timer = setTimeout(function() {
+                $.ajax({
+                    type: 'GET',
+                    url: '". check_url(url("admin/drupal_tweaks/autocomplete/filter_modules/", array('absolute' => TRUE))) ."' + value,
+                    dataType: 'json',
+                    success: function (matches) {
+                        set_mod_matches('none');
+
+                        $.each(matches, function(index, value) {
+                          if($( '#' + value ).length)
+                             $( '#' + value ).parent().parent().css('display', 'table-row');
+                        });
+                    },
+                    error: function (xmlhttp) {
+                        alert(Drupal.ahahError(xmlhttp, 'URL'));
+                    }
+                });
+
+            }, 500);
+        }
+        ";
+
+  drupal_add_js($js_code, 'inline');
+
   drupal_add_js('misc/form.js', 'core');
 
   return $form;
@@ -135,6 +228,7 @@ function drupal_tweaks_module_admin_modules() {
     '#prefix' => '<div class="container-inline">',
     '#suffix' => '</div>',
   );
+
   $options = array();
   foreach (module_invoke_all('drupal_tweaks_module_operations') as $operation => $array) {
     $options[$operation] = $array['label'];
@@ -157,7 +251,7 @@ function drupal_tweaks_module_admin_modules() {
     $info = (object)unserialize($module->info);
 // var_dump($info); exit;
     $form['name'][$module->name] = array('#value' => l($info->name, 'http://drupal.org/project/'. $module->name, array('attributes' => array('target' => '_blank'))));
-    $form['raw_name'][$module->name] =  array('#value' => $module->name);
+    $form['raw_name'][$module->name] =  array('#value' => $module->name, "#prefix" => '<div id="'. $module->name .'">', "#suffix" => "</div>");
     $form['version'][$module->name] =  array('#value' => $info->version);
     $form['package'][$module->name] = array('#value' => $info->package);
     $form['schema'][$module->name] = array('#value' => $module->schema_version);
@@ -165,7 +259,7 @@ function drupal_tweaks_module_admin_modules() {
     // $form['operations'][$module->name] = array('#value' => l(t('edit'), 'node/'. $module->name .'/edit', array('query' => $destination)));
   }
   $form['modules'] = array('#type' => 'checkboxes', '#options' => $modules);
-  $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
+  //$form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
   $form['#theme'] = 'drupal_tweaks_module_admin_modules';
   return $form;
 }

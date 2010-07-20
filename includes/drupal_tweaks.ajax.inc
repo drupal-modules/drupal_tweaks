@@ -29,6 +29,21 @@ function drupal_tweaks_autocomplete_modules($string = '') {
   drupal_json($matches);
 }
 
+function drupal_tweaks_filter_modules($string = '')
+{
+  $matches = array();
+  if ($string) {
+    $result = db_query_range("SELECT name, info FROM {system} WHERE type = 'module'", 0, 10000);
+    while ($row = db_fetch_object($result)) {
+      $info = unserialize($row->info);
+      if( !(strpos(strtolower($info['name']), strtolower($string)) === false) )
+        $matches[] = check_plain($row->name);
+    }
+  }
+  
+  drupal_json($matches);
+}
+
 /**
  * Menu callback; Retrieve a JSON object containing autocomplete suggestions for nodes
  */
