@@ -200,16 +200,21 @@ function drupal_tweaks_module_check_db_changes($module_name, $reset = FALSE) {
 /**
  * Return current backtrace
  */
-function drupal_tweaks_get_backtrace($limit = 100, $nl = "<br>\n", $tab = ".") {
+function drupal_tweaks_get_backtrace($limit = 100, $depth = 7, $nl = "<br>\n", $tab = ".") {
   $backtrace = debug_backtrace(TRUE);
   if (is_array($backtrace)) {
-    array_shift($backtrace); // remove this function from array
-    array_shift($backtrace); // remove drupal_tweaks_show_backtrace/drupal_tweaks_log_backtrace from array
-    array_shift($backtrace); // remove drupal_tweaks_watchdog
-    array_shift($backtrace); // remove call_user_func_array(module.inc:450)
-    array_shift($backtrace); // remove module_invoke(bootstrap.inc:839)
-    array_shift($backtrace); // remove watchdog(common.inc:619)
-    array_shift($backtrace); // drupal_error_handler(genmod.install:326) 
+    for ($i = 0; $i < $depth; $i++) {
+      array_shift($backtrace);
+    }
+    /* Error handler - 7 steps:
+      1. remove this function from array
+      2. remove drupal_tweaks_show_backtrace/drupal_tweaks_log_backtrace from array
+      3. remove drupal_tweaks_watchdog
+      4. remove call_user_func_array(module.inc:450)
+      5. remove module_invoke(bootstrap.inc:839)
+      6. remove watchdog(common.inc:619)
+      7. drupal_error_handler(genmod.install:326) 
+    */
     $buffer = '';
     $counter = 0;
     foreach ($backtrace as $index => $function) {
@@ -240,6 +245,8 @@ function drupal_tweaks_get_backtrace($limit = 100, $nl = "<br>\n", $tab = ".") {
 function drupal_tweaks_show_backtrace() {
     $bt_code = "<br>\nBacktrace:<br>\n" . drupal_tweaks_get_backtrace(variable_get('drupal_tweaks_backtrace_log_arg_max_length', 1000));
     $_SESSION['messages']['error'][count($_SESSION['messages']['error'])-1] .= $bt_code;
+    /* TODO: make support for status - how to detect type of message? */
+    // $_SESSION['messages']['status'][count($_SESSION['messages']['status'])-1] .= $bt_code;
 }
 
 /**

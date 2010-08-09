@@ -55,6 +55,22 @@ function drupal_tweaks_general_tweaks_form() {
     '#default_value' => variable_get('drupal_tweaks_backtrace_error_pages_log', FALSE),
   );
 
+/* TODO: Finish drupal_tweaks_show_backtrace()
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_any_pages_show'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show backtrace on every Drupal message.'),
+    '#description' => t('Show backtrace above every Drupal message (BEWARE of performance slowdown! - use only for debugging purposes).'),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_any_pages_show', FALSE),
+  );
+
+  $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_any_pages_log'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Log backtrace on every Drupal message.'),
+    '#description' => t('Log backtrace on every Drupal message (BEWARE of performance slowdown! - use only for debugging purposes). (Link: <a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
+    '#default_value' => variable_get('drupal_tweaks_backtrace_any_pages_log', FALSE),
+  );
+*/
+
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_adv'] = array(
     '#type' => 'fieldset',
     '#title' => t('Advanced development settings'),

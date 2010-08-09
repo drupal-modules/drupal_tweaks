@@ -468,6 +468,8 @@ function theme_status_messages_dt($display = NULL) {
 }
 
 function drupal_tweaks_watchdog($log) {
+  $bc_show = FALSE;
+  $bc_log = FALSE;
   switch ($log['type']) {
     case 'php':
         if ($msg_type = ($log['variables']['%error'] ? $log['variables']['%error'] : $log['variables']['%type'])) {
@@ -479,10 +481,12 @@ function drupal_tweaks_watchdog($log) {
                 if (variable_get('drupal_tweaks_backtrace_php_show', FALSE)) {
                   module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
                   drupal_tweaks_show_backtrace();
+                  $bc_show = TRUE;
                 }
                 if (variable_get('drupal_tweaks_backtrace_php_log', TRUE)) {
                   module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
                   drupal_tweaks_log_backtrace($log);
+                  $bc_log = TRUE;
                 }
               break;
               default:
@@ -494,13 +498,25 @@ function drupal_tweaks_watchdog($log) {
       if (variable_get('drupal_tweaks_backtrace_error_pages_show', FALSE)) {
         module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
         drupal_tweaks_show_backtrace();
+        $bc_show = TRUE;
       }
       if (variable_get('drupal_tweaks_backtrace_error_pages_log', FALSE)) {
         module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
         drupal_tweaks_log_backtrace($log);
+        $bc_log = TRUE;
       }
     break;
     default:
+      if (variable_get('drupal_tweaks_backtrace_any_pages_show', FALSE)) {
+        module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+        drupal_tweaks_show_backtrace(100, 2); exit;
+        $bc_show = TRUE;
+      }
+      if (variable_get('drupal_tweaks_backtrace_any_pages_log', FALSE)) {
+        module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+        drupal_tweaks_log_backtrace($log);
+        $bc_log = TRUE;
+      }
   }
   // drupal_set_message($log['type']);
 /*
