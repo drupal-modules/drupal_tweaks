@@ -509,7 +509,7 @@ function drupal_tweaks_watchdog($log) {
     default:
       if (variable_get('drupal_tweaks_backtrace_any_pages_show', FALSE)) {
         module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
-        drupal_tweaks_show_backtrace(100, 2); exit;
+        drupal_tweaks_show_backtrace(100, 4);
         $bc_show = TRUE;
       }
       if (variable_get('drupal_tweaks_backtrace_any_pages_log', FALSE)) {
