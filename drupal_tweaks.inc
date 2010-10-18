@@ -222,10 +222,14 @@ function drupal_tweaks_get_backtrace($limit = 100, $depth = 7, $nl = "<br>\n", $
         $line = !empty($backtrace[$index]['line']) ? $backtrace[$index]['line'] : '?';
         $filename = !empty($backtrace[$index]['file']) ? basename($backtrace[$index]['file']) : '?';
         $args = NULL;
-        if (isset($function['args'])) {
-          $args = is_string($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
+        if (!empty($function['args']) && !is_bool($function['args'])) {
+          $args = is_scalar($function['args']) ? $function['args'] : serialize($function['args']); // serialize arrays and objects
+        } elseif (is_bool($function['args'])) {
+          $args = $function['args'] ? 'TRUE' : 'FALSE';
+        } else {
+          $args = '';
         }
-        $args = (!empty($limit) && strlen($args) > $limit) ? gettype($args) : $args;
+        $args = (!empty($limit) && strlen($args) > $limit) ? gettype($function['args']) : gettype($function['args']) . ':' . $args;
         $buffer .= str_repeat($tab, $counter++);
         $buffer .= "$function_name($args)[$filename:$line];" . $nl;
     }
