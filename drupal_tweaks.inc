@@ -12,6 +12,11 @@
  */
 
 /**
+ * Define the minimum PHP level for passing an optional parameter to debug_backtrace().
+ */
+define('DRUPAL_TWEAKS_BACKTRACE_PARAM_MINIMUM_PHP', '5.2.5');
+
+/**
  * Get PHP configuration
  */
 function drupal_tweaks_get_php_configuration($raw = FALSE, $name = NULL) {
@@ -201,7 +206,7 @@ function drupal_tweaks_module_check_db_changes($module_name, $reset = FALSE) {
  * Return current backtrace
  */
 function drupal_tweaks_get_backtrace($limit = 100, $depth = 7, $nl = "<br>\n", $tab = ".") {
-  $backtrace = debug_backtrace(TRUE);
+  $backtrace =  (version_compare(phpversion(), DRUPAL_TWEAKS_BACKTRACE_PARAM_MINIMUM_PHP) < 0) ? debug_backtrace() : debug_backtrace(TRUE);
   if (is_array($backtrace)) {
     for ($i = 0; $i < $depth; $i++) {
       array_shift($backtrace);
