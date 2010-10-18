@@ -134,23 +134,21 @@ function drupal_tweaks_include_shared_code() {
  * Javascript code for anonymous statistics within drupal_tweaks pages
  * It will give opportunity to improve which settings are more popular than other
  */
-  variable_get('drupal_tweaks_settings_stats_activated', TRUE) ? 
-  drupal_add_js('
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src=\'" + gaJsHost + "google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E"));
-  var pageTracker;
-  setTimeout("startGA();", 500);
-  function startGA()
-  {
-    try {
-    var pageTracker = _gat._getTracker("UA-948811-17");
-    pageTracker._setDomainName("none");
-    pageTracker._setAllowLinker(true);
-    pageTracker._trackPageview();
-    } catch(err) {}
+  if (variable_get('drupal_tweaks_settings_stats_activated', FALSE)) { 
+    drupal_add_js('
+      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+      document.write(unescape("%3Cscript src=\'" + gaJsHost + "google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E"));
+    ', 'inline');
+    drupal_add_js('
+      try {
+        var pageTracker = _gat._getTracker("UA-948811-17");
+        pageTracker._setDomainName("none");
+        pageTracker._setAllowLinker(true);
+        pageTracker._trackPageview();
+      } catch(err) {}
+    ', 'inline');
+    drupal_add_js('pageTracker._trackPageview(location.pathname);', 'inline');
   }
-  ', 'inline') : NULL;
-  drupal_add_js('pageTracker._trackPageview(location.pathname);', 'inline');
 }
 
 /**
