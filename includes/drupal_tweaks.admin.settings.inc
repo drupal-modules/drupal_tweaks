@@ -29,7 +29,7 @@ function drupal_tweaks_general_settings_form() {
     '#type' => 'checkbox',
     '#title' => t('Send anonymous statistics about module usage through Google Analytics.'),
     '#description' => t('It will help to improve functionality of this module even better.'),
-    '#default_value' => variable_get('drupal_tweaks_settings_stats_activated', TRUE),
+    '#default_value' => variable_get('drupal_tweaks_settings_stats_activated', FALSE),
   );
 
   return system_settings_form($form); 
