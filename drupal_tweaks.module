@@ -406,6 +406,7 @@ function drupal_tweaks_theme_registry_alter(&$items) {
   $items['status_messages_dt_org'] = $items['status_messages']; // make a copy of original
   $items['status_messages']['function'] = 'theme_status_messages_dt'; // take over theme_status_messages
   $items['status_messages'] = $items['status_messages_dt']; // override theme_status_messages
+  // TODO: What about: 'preprocess functions'?
 }
 
 /**
