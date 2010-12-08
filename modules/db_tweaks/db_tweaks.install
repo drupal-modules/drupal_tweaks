@@ -16,7 +16,7 @@
  */
 function db_tweaks_install() {
   $min_weight = db_result(db_query("SELECT MIN(weight) FROM {system}"));
-  db_query("UPDATE {system} SET bootstrap = '%d', weight = '%d' WHERE name = 'db_tweaks'", 1, $min_weight);
+  db_query("UPDATE {system} SET bootstrap = '%d', weight = '%d' WHERE name = 'db_tweaks'", 1, ($min_weight-1));
 }
 
 /**
