@@ -12,10 +12,6 @@
  */
 
 /**
- * Minimum recommended value of PHP memory_limit.
- */
-define('DRUPAL_MINIMUM_PHP_MEMORY_LIMIT', '16M'); 
-/**
  * Minimum recommended value of PHP max_execution_time limit.
  */
 define('DRUPAL_MINIMUM_MAX_EXECUTION_TIME', '30'); 
@@ -301,8 +297,7 @@ function drupal_tweaks_boot() {
         // update mysql settings if necessary
         if ($var_values['conf'] <> $var_values['php']) {
             if (!ini_set($var_name, $var_values['conf'])) {
-              $t = drupal_tweaks_get_t();
-              drupal_tweaks_set_message($t('Cannot set variable `%variable` to `%value` in your PHP configuration!<br>Probably you do not have proper privileges.', array('%variable' => $var_name, '%value' => $var_values['conf'])), 'error');
+              drupal_tweaks_set_message(array('Cannot set variable `%variable` to `%value` in your PHP configuration!<br>Probably you do not have proper privileges.', array('%variable' => $var_name, '%value' => $var_values['conf'])), 'error');
               variable_set($var_name, $var_values['php']); // reverting changes in settings (to prevent showing error message)
             }
         }
@@ -634,6 +629,7 @@ function drupal_tweaks_set_message($message = NULL, $type = 'status', $repeat = 
   } else {
     foreach ($dt_msgs as $key => $msg_data) {
       $msg = is_array($msg_data['message']) ? t($msg_data['message'][0], $msg_data['message'][1], $msg_data['message'][2]) : $msg_data['message'];
+      // FIXME: any better way to do support for arguments: 3, 4, 5, etc.
       drupal_set_message($msg, $msg_data['type'], $msg_data['repeat']);
     }
   }

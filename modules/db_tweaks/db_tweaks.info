@@ -4,4 +4,4 @@ description = Database tweaks module for additional MySQL settings
 core = 6.x
 package = Drupal Tweaks
 version = VERSION
-
+dependencies[] = drupal_tweaks

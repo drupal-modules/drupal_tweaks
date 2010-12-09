@@ -59,10 +59,9 @@ function db_tweaks_boot() {
                 // update mysql settings if necessary
                 if ($var_values['conf'] <> $var_values['mysql']) {
                     if (!db_tweaks_set_mysql_variable($var_name, $var_values['conf'])) {
-			module_load_include('module', 'drupal_tweaks'); // load module file for special messaging functionality
-			drupal_tweaks_set_message(sprintf('Cannot set variable `%s` to `%s` in your database configuration!', $var_name, $var_values['conf']) .
-			    '<br>' . 'Probably you do not have proper privileges.', 'error');
-                        variable_set($var_name, $var_values['mysql']); // reverting changes in settings (to prevent showing error message)
+                      module_load_include('module', 'drupal_tweaks'); // load module file for special messaging functionality
+                      drupal_tweaks_set_message(array('Cannot set variable `%name` to `%value` in your database configuration!<br>Probably you do not have proper privileges on the database server.', array('%name' => $var_name, '%value' => $var_values['conf'])), 'error');
+                      variable_set($var_name, $var_values['mysql']); // reverting changes in settings (to prevent showing error message)
                     }
                 }
             }
