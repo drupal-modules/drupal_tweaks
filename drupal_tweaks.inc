@@ -221,7 +221,7 @@ function drupal_tweaks_get_backtrace($limit = 100, $depth = 7, $nl = "<br>\n", $
     $buffer = '';
     $counter = 0;
     foreach ($backtrace as $index => $function) {
-        $function_name = $function['function'];
+        $function_name = isset($function['class']) ? $function['class'] . '->' . $function['function'] : $function['function'];
         $line = !empty($backtrace[$index]['line']) ? $backtrace[$index]['line'] : '?';
         $filename = !empty($backtrace[$index]['file']) ? basename($backtrace[$index]['file']) : '?';
         $args = '';
