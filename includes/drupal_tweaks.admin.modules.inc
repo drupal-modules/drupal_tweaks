@@ -220,7 +220,7 @@ function drupal_tweaks_module_admin_modules() {
 
   $filter = drupal_tweaks_module_build_filter_query();
 
-  $result = pager_query(db_rewrite_sql('SELECT * FROM {system} s '. $filter['join'] . ' ' . $filter['where'] .' ORDER BY s.weight DESC'), 50, 0, NULL, $filter['args']);
+  $result = db_query('SELECT * FROM {system} s '. $filter['join'] . ' ' . $filter['where'] .' ORDER BY s.weight DESC');
 
   $form['options'] = array(
     '#type' => 'fieldset',
