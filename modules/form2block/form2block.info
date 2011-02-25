@@ -1,4 +1,3 @@
-; $Id$
 name = form2block
 description = Convert any form or node into block
 ; core = 6.x

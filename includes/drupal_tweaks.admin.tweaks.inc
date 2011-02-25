@@ -5,7 +5,6 @@
  *   Settings Page for module tweaks
  *
  * @version
- *   $Id$
  *
  * @developers
  *   Rafal Wieczorek <kenorb@gmail.com>

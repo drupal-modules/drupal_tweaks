@@ -15,7 +15,6 @@
  *     - and many more ...
  *
  * @version
- *   $Id$
  *
  * @developers:
  *    Rafal Wieczorek <kenorb@gmail.com>

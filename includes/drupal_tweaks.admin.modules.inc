@@ -5,7 +5,6 @@
  *   Form with Module Manager
  *
  * @version
- *   $Id$
  *
  * @developers
  *   Rafal Wieczorek <kenorb@gmail.com>
