@@ -454,7 +454,7 @@ function theme_status_messages_dt($display = NULL) {
         unset($_SESSION['messages'][$type]);
       }
     }
-    drupal_alter('status_messages', $_SESSION['messages']);
+    drupal_alter('status_messages', $_SESSION['messages']); // Hands off alterable variables to type-specific *_alter implementations.
   }
   // $org_callback = variable_get('drupal_tweaks_status_messages_theme_callback', array('function' => 'theme_status_messages'));
   // $output = function_exists($org_callback['function']) ? $org_callback['function']($display) : $org_callback['function']($display);
@@ -462,6 +462,10 @@ function theme_status_messages_dt($display = NULL) {
   return $output;
 }
 
+/**
+ * Implementation of hook_watchdog
+ *
+ */
 function drupal_tweaks_watchdog($log) {
   $bc_show = FALSE;
   $bc_log = FALSE;
@@ -517,6 +521,30 @@ function drupal_tweaks_watchdog($log) {
 /*
     $log['user']->uid, $log['type'], $log['message'], serialize($log['variables']), $log['severity'], $log['link'], $log['request_uri'], $log['referer'], $log['ip'], $log['timestamp']);
 */
+}
+
+/**
+  * Implementation of hook_status_messages_alter
+  *
+  * See: theme_status_messages_dt()
+*/
+function drupal_tweaks_status_messages_alter(&$messages) {
+  $bc_show = FALSE;
+  $bc_log = FALSE;
+  foreach ($messages as $msg_type => $message_arr) {
+    foreach ($message_arr as $key => $message) {
+      if (variable_get('drupal_tweaks_backtrace_on_msg_' . $msg_type, FALSE)) {
+        module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+        drupal_tweaks_show_backtrace();
+        $bc_show = TRUE;
+      }
+      if (variable_get('drupal_tweaks_backtrace_log_on_msg_' . $msg_type, FALSE)) {
+        module_load_include('inc', 'drupal_tweaks'); // load additional function from included file
+        drupal_tweaks_log_backtrace($log);
+        $bc_log = TRUE;
+      }
+    }
+  }
 }
 
 /**

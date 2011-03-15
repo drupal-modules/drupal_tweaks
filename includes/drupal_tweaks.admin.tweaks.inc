@@ -36,7 +36,7 @@ function drupal_tweaks_general_tweaks_form() {
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_php_log'] = array(
     '#type' => 'checkbox',
     '#title' => t('Log backtrace on PHP errors.'),
-    '#description' => t('Log backtrace on Drupal error messages. (Link: <a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
+    '#description' => t('Log backtrace on Drupal error messages. (<a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
     '#default_value' => variable_get('drupal_tweaks_backtrace_php_log', TRUE),
   );
 
@@ -50,9 +50,35 @@ function drupal_tweaks_general_tweaks_form() {
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_error_pages_log'] = array(
     '#type' => 'checkbox',
     '#title' => t('Log backtrace on Drupal error pages.'),
-    '#description' => t('Log backtrace on Drupal error pages (like Permission Denied or Page Not Found page). (Link: <a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
+    '#description' => t('Log backtrace on Drupal error pages (like Permission Denied or Page Not Found page). (<a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'))),
     '#default_value' => variable_get('drupal_tweaks_backtrace_error_pages_log', FALSE),
   );
+
+  $form['drupal_tweaks_dev']['drupal_tweaks_msgs'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Debug Drupal messages'),
+    '#description' => t('Note that those options are probably useless, all backtraces pointing to the same place, where message is rendered.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  foreach (array('error', 'warning', 'status') as $msg_type) {
+    $form['drupal_tweaks_dev']['drupal_tweaks_msgs']['drupal_tweaks_backtrace_on_msg_' . $msg_type] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show backtrace on every Drupal %type message.', array('%type' => t($msg_type))),
+      '#description' => t('Show backtrace above every Drupal %type messages (BEWARE of performance slowdown! - use only for debugging purposes). If disabled, make sure that <i>Message tweaks</i> option is enabled.', array('%type' => t($msg_type))),
+      '#default_value' => variable_get('drupal_tweaks_backtrace_on_msg_' . $msg_type, FALSE),
+      '#disabled' => !variable_get('drupal_tweaks_msg2log_activated', FALSE),
+    );
+
+    $form['drupal_tweaks_dev']['drupal_tweaks_msgs']['drupal_tweaks_backtrace_log_on_msg_' . $msg_type] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Log backtrace on every Drupal %type message.', array('%type' => t($msg_type))),
+      '#description' => t('Log backtrace on Drupal %type messages. If disabled, make sure that <i>Message tweaks</i> option is enabled. (<a href="!url">Recent log entries</a>)', array('!url' => url('admin/reports/dblog'), '%type' => $msg_type)),
+      '#default_value' => variable_get('drupal_tweaks_backtrace_log_on_msg_' . $msg_type, FALSE),
+      '#disabled' => !variable_get('drupal_tweaks_msg2log_activated', FALSE),
+    );
+  }
 
 /* TODO: Finish drupal_tweaks_show_backtrace()
   $form['drupal_tweaks_dev']['drupal_tweaks_backtrace_any_pages_show'] = array(
