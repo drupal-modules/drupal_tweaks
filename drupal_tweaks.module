@@ -469,9 +469,12 @@ function theme_status_messages_dt($display = NULL) {
 function drupal_tweaks_watchdog($log) {
   $bc_show = FALSE;
   $bc_log = FALSE;
+  if (!function_exists('module_load_include')) {
+    return;
+  }
   switch ($log['type']) {
     case 'php':
-        if ($msg_type = ($log['variables']['%error'] ? $log['variables']['%error'] : $log['variables']['%type'])) {
+        if ($msg_type = (isset($log['variables']['%error']) ? $log['variables']['%error'] : $log['variables']['%type'])) {
             switch (drupal_strtolower($msg_type)) {
               case 'recoverable fatal error':
               case 'user warning':
